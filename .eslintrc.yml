@@ -1,0 +1,30 @@
+env:
+  es2021: true
+  browser: true
+extends: "plugin:vue/vue3-strongly-recommended"
+parserOptions:
+  sourceType: "module"
+  ecmaVersion: 12
+rules:
+  indent: # 缩进4格
+    - error
+    - 2
+  linebreak-style: # LF风格的换行(\n)
+    - error
+    - windows
+  space-before-blocks: # 块前无空格报错
+    - error
+  no-trailing-spaces: # 结束有空格报错
+    - error
+  object-curly-spacing: # 对象前后无空格报错
+    - error
+    - always
+  quotes: # 非单引号报错
+    - error
+    - single
+  array-bracket-spacing: # 数组前后有空格报错
+    - error
+    - never
+  no-useless-catch: # 不限制try-catch的格式
+    - off
+  max-len: 1 # 限制一行最大长度为80字符
