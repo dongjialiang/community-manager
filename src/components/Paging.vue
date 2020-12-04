@@ -1,39 +1,28 @@
 <template>
-  <div
-    class="page-code-box"
-    :class="{
-      'all-radius': page > 1 && page < pageSize,
-      'right-radius': page === 1,
-      'left-radius': page === pageSize,
-    }"
-  >
-    <left
+  <div class="page-code-box">
+    <span
       v-if="page > 1"
-      class="prev-button"
+      class="page-code-button prev-button"
       @click="prevPage()"
-    />
+    >◀</span>
     <span
       v-for="item in pageSize"
       :key="item"
       class="page-code-button"
       :class="{ 'current-page': page === item }"
       @click="jumpToPage(item)"
-    >
-      {{ item }}
-    </span>
-    <right
+    >{{ item }}</span>
+    <span
       v-if="page < pageSize"
-      class="next-button"
+      class="page-code-button next-button"
       @click="nextPage()"
-    />
+    >▶</span>
   </div>
 </template>
 <script>
 import { inject } from 'vue'
-import { Left, Right } from '@icon-park/vue-next';
 export default {
   name: 'Paging',
-  components: { Left, Right, },
   props: {
     pageSymbol: {
       type: Symbol,
@@ -62,19 +51,9 @@ export default {
   margin: 1em auto;
   display: block;
 }
-.page-code-box > span {
-  vertical-align: top;
+.page-code-button {
   border: solid 1px rgba(226, 232, 240, 1);
   box-shadow: 0.1em 0.1em 0.1em #cdcdcd;
-}
-.all-radius {
-  border-radius: .5em;
-}
-.left-radius {
-  border-radius: .5em 0 0 .5em;
-}
-.right-radius {
-  border-radius: 0 .5em .5em 0;
 }
 .current-page {
   background-color: #ccc;
@@ -84,30 +63,24 @@ export default {
   font-weight: 500;
   box-sizing: border-box;
   color: rgba(74, 85, 104, 1);
-  font-size: 0.875rem;
   transition: background-color, border-color, color,
     box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
-.prev-button,
-.next-button {
-  background-color: #fff;
-  padding: 0.6em 0.8em 0.45em;
-  font-size: 0.875rem;
+.page-code-button:hover {
+  color: rgba(226, 232, 240, 0.9);
+  border: solid 1px rgba(26, 22, 24, 1);
+  background-color: rgba(20, 0, 10, 0.7);
+}
+.page-code-button:active {
+  background-color: rgba(10, 140, 160, 0.7);
+  border: solid 1px rgba(26, 232, 240, 1);
 }
 .prev-button {
   border-radius: 0.5em 0 0 0.5em;
+  padding: .5em 1em .5em .8em;
 }
 .next-button {
   border-radius: 0 0.5em 0.5em 0;
-}
-.page-code-box span:hover,
-.page-code-box span:hover {
-  color: rgba(226, 232, 240, 0.9);
-  background-color: rgba(20, 0, 10, 0.7);
-}
-.page-code-box span:active,
-.page-code-box span:active {
-  background-color: rgba(10, 140, 160, 0.7);
-  border: solid 1px rgba(26, 232, 240, 1);
+  padding: .5em .8em .5em 1em;
 }
 </style>

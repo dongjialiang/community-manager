@@ -2,9 +2,10 @@
   <input
     v-if="column?.type === 'bool'"
     type="checkbox"
+    class="checkbox"
     :value="item[column.name]"
     :checked="item[column.name]"
-    @click="changeListItem(id, column)"
+    @click="changeListItem(id, column, item)"
   >
 
   <template v-else-if="column?.type === 'file'">
@@ -15,14 +16,16 @@
     >
     <template v-else>
       <input
+        id="banner"
         type="file"
         name="banner"
+        hidden
+        @change="modalAction(uploadImage, '上传海报', id)"
       >
-      <input
-        type="button"
-        value="提交"
-        @click="uploadImage(id)"
-      >
+      <label
+        class="banner"
+        for="banner"
+      >上传🖼海报</label>
     </template>
   </template>
 
@@ -35,14 +38,15 @@
       type="radio"
       :name="`radio${item._id || 'new'}`"
       :value="option"
-      @change="changeListItem(id, column)"
+      :checked="item[column.name] === option"
+      @change="changeListItem(id, column, item)"
     >{{ option }}
   </template>
 
   <select
     v-else-if="column?.type === 'select'"
     :value="item[column.name]"
-    @input="changeListItem(id, column)"
+    @input="changeListItem(id, column, item)"
   >
     <option
       v-for="option in column?.options"
@@ -53,23 +57,58 @@
     </option>
   </select>
 
+  <div
+    v-else-if="column.type === 'array'"
+    class="array-item"
+  >
+    <div class="array-item-title">
+      <i>查询多个</i>
+      <i>查询</i>
+      <i>创建</i>
+      <i>创建多个</i>
+      <i>更新</i>
+      <i>删除</i>
+      <i>删除多个</i>
+    </div>
+    <div
+      v-for="authcheck in item[column.name]"
+      :key="authcheck"
+    >
+      <span class="array-item-name">{{ authcheck.split('-')[0] }}-</span>
+      <div
+        v-for="(authNum, index) in getAuthArr(authcheck.split('-')[1])"
+        :key="index"
+        class="array-item-value"
+      >
+        <input
+          type="checkbox"
+          :value="authNum"
+          :checked="authNum === (2 ** index)"
+          @click="changeListItem(
+            id, column, item, authcheck.split('-')[0], 2 ** index)"
+        >
+      </div>
+    </div>
+  </div>
+
   <span
     v-else-if="column.type === 'bool'"
-    @input="changeListItem(id, column)"
+    @input="changeListItem(id, column, item)"
   >
     {{ item[column.name] }}
   </span>
   <span
     v-else
     contenteditable="plaintext-only"
-    @input="changeListItem(id, column)"
+    @input="changeListItem(id, column, item)"
   >
     {{ item[column.name] }}
   </span>
 </template>
 
 <script>
-import { inject } from 'vue'
+import { inject, watchEffect } from 'vue'
+import modal from '../services/modal'
 import Upload from '../services/Upload'
 export default {
   name: 'DataAction',
@@ -98,8 +137,11 @@ export default {
   setup(props) {
     const source   = inject(props.sourceSymbol)
     const tempList = inject(props.tempListSymbol)
+
+    const modalAction = modal().modalAction
+
     // 修改列表内容(只影响视图层, 不修改模型层)
-    const changeListItem = (id, column, path) => {
+    const changeListItem = (id, column, item, path, fixAuthNum) => {
       let content;
       const e = event;
       const name = column.name
@@ -113,19 +155,48 @@ export default {
         content = path
       } else if (type === 'select' || type === 'radio') {
         content = e.currentTarget.value
+      } else if (type === 'array') {
+        const eNum = Number(e.currentTarget.value)
+        let authList = [...item[name]]
+        let tempListVal = tempList.value[id]
+        if (tempListVal !== undefined) {
+          if (tempListVal.hasOwnProperty(name)) {
+            authList = tempListVal[name]
+          }
+        }
+        const authListLen = authList.length
+        for (let index = 0; index < authListLen; index++) {
+          const authItem = authList[index]
+          const [authKey, authNum] = authItem.split('-')
+          if (authKey === path) {
+            e.currentTarget.value = eNum > 0
+              ? 0 : fixAuthNum
+            const newNum = eNum < fixAuthNum ? fixAuthNum : -eNum
+            authList[index] = `${authKey}-` +
+            `${Number(authNum) + newNum}`
+          }
+        }
+        content = authList
       } else {
         content = e.currentTarget.innerText
       }
-      const tempObj = {} // 临时Map对象
+      const tempObj = {} // 临时对象
 
-      tempObj[name] = content
-      if (tempList.value[id]) {
-        tempList.value[id] = {
-          ...tempList.value[id],
-          ...tempObj
-        }
+      const itemIsNone = item[name] === undefined
+
+      if ((content === '' && itemIsNone)
+        || compare(content, item[name])) {
+        delete tempList.value[id][name]
       } else {
-        tempList.value[id] = tempObj
+        tempObj[name] = content
+        if (tempList.value[id]) {
+          tempList.value[id] = {
+            ...tempList.value[id],
+            ...tempObj
+          }
+        } else {
+          tempList.value[id] = tempObj
+        }
       }
     }
     // 上传图片
@@ -140,13 +211,37 @@ export default {
         for (const data of source.value.data) {
           if (data._id === id) {
             data.banner = res.data.path
-            changeListItem(id, props.column, data.banner)
+            changeListItem(id, props.column, data, data.banner)
             break
           }
         }
       }
     }
-    return { uploadImage, changeListItem }
+
+    const compare = (first, second) => {
+      if (Array.isArray(first) && Array.isArray(second)) {
+        return first.toString() === second.toString()
+      } else {
+        return first === second
+      }
+    }
+
+    const getAuthArr = (authVal) => {
+      let authNum = Number(authVal)
+      const authArr = []
+      let n = 64
+      while (authNum) {
+        if (authNum >= n) {
+          authNum -= n
+          authArr.unshift(n)
+        } else {
+          authArr.unshift(0)
+        }
+        n /= 2
+      }
+      return authArr
+    }
+    return { uploadImage, changeListItem, modalAction, getAuthArr }
   }
 }
 </script>
@@ -154,5 +249,49 @@ export default {
 <style scoped>
 .banner-img {
   max-width: 8em;
+}
+span {
+  display: block;
+  overflow-wrap: break-word;
+  max-width: 13em;
+}
+.banner {
+  border: 1px dotted #000;
+  display: block;
+  box-sizing: content-box;
+  height: 3.5em;
+  line-height: 3.5em;
+}
+.checkbox {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+}
+.checkbox::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.array-item {
+  width: 20em;
+}
+.array-item-title {
+  text-align: right;
+}
+.array-item-title > i {
+  writing-mode: vertical-lr;
+  font-size: .9em;
+  width: 1.9em;
+}
+.array-item-name,
+.array-item-value {
+  display: inline-block;
+}
+.array-item-name {
+  width: 8em;
+}
+.array-item-value {
+  width: 1.7em;
 }
 </style>

@@ -15,7 +15,7 @@
     >
     <button
       class="submit"
-      @click="submit"
+      @click="modalAction(submit, '登录')"
     >
       登录
     </button>
@@ -23,10 +23,11 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router'
 import createStore from '../store'
 import Admin from '../services/Admin'
+import modal from '../services/modal'
 export default {
   name: 'Login',
   setup() {
@@ -36,11 +37,13 @@ export default {
     const router = useRouter()
     const store = createStore()
 
+    const modalAction = modal().modalAction
+
     const submit = async () => {
       const res = await Admin.login(
         { admin: admin.value, pwd: pwd.value })
 
-      if (res.status === 200) {
+      if (res?.status === 200) {
         const data = res.data
         store.setToken(data.token)
         store.setUser(data.body)
@@ -49,7 +52,7 @@ export default {
       }
     }
 
-    return { admin, pwd, submit }
+    return { admin, pwd, submit, modalAction }
   },
 };
 </script>
@@ -64,9 +67,6 @@ export default {
   font-weight: 500;
   outline: none;
   border-width: 0 0 1px;
-  border-style: solid;
-  border-color: #000;
-  border-radius: 0;
 }
 .submit {
   margin: 0.5em auto;

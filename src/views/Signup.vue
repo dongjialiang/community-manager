@@ -15,7 +15,7 @@
     >
     <button
       class="submit"
-      @click="submit"
+      @click="modalAction(submit, '注册')"
     >
       注册
     </button>
@@ -23,23 +23,27 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
+import { ref, watchEffect } from 'vue';
 import createStore from '../store'
 import Admin from '../services/Admin'
+import modal from '../services/modal'
 import { useRouter } from 'vue-router';
 export default {
   name: 'Signup',
   setup() {
     const admin = ref('')
     const pwd = ref('')
+
     const router = useRouter()
     const store = createStore()
+
+    const modalAction = modal().modalAction
 
     const submit = async () => {
       const res = await Admin.signup(
         { admin: admin.value, pwd: pwd.value })
 
-      if (res.status === 200) {
+      if (res?.status === 200) {
         const data = res.data
         store.setToken(data.token)
         store.setUser(data.body)
@@ -48,7 +52,7 @@ export default {
       }
     }
 
-    return { admin, pwd, submit }
+    return { admin, pwd, submit, modalAction }
   },
 };
 </script>
@@ -61,6 +65,8 @@ export default {
   margin: 0.5em auto;
   font-size: 1.2em;
   font-weight: 500;
+  outline: none;
+  border-width: 0 0 1px;
 }
 .submit {
   margin: 0.5em auto;

@@ -34,6 +34,11 @@ export default {
         type: 'file'
       },
       {
+        name: 'address',
+        cn_name: '地址',
+        tip: '开展活动的商铺地址',
+      },
+      {
         name: 'startTime',
         cn_name: '活动开始时间',
         tip: '活动最早可以开始的时间',

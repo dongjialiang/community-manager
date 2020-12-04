@@ -54,5 +54,4 @@ export default {
     return { columns, listName };
   },
 };
-// TODO: 修改生活服务视图页面, 弹出提示, 侧边提示,
 </script>

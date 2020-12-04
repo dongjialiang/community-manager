@@ -40,6 +40,10 @@ export default createRouter({
       component: () => import('./views/Complaint.vue')
     },
     {
+      path: '/user',
+      component: () => import('./views/User.vue')
+    },
+    {
       path: '/signup',
       component: () => import('./views/Signup.vue')
     },

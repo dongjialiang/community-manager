@@ -22,15 +22,13 @@ export default {
   color: #fff;
   border-radius: .5em;
   padding: .3em .6em;
-  top: 1.8em;
-  left: -10%;
   z-index: 3;
   display: block;
   font-size: 0;
   opacity: 0;
   transition: opacity 2s cubic-bezier(0.075, 0.82, 0.165, 1);
 }
-.tip:after {
+.tip::after {
   position: absolute;
   content: '';
   top: -1em;
@@ -39,8 +37,19 @@ export default {
   border-style: solid;
   border-color: transparent transparent #000 transparent;
 }
-.list-head:hover .tip {
+.list-head:hover .tip,
+.function-button:hover .tip
+{
   font-size: 1em;
   opacity: 1;
+}
+.list-head:hover .tip {
+  top: 1.8em;
+  left: -10%;
+}
+.function-button:hover .tip {
+  top: 2em;
+  left: -4em;
+  font-size: .6em;
 }
 </style>

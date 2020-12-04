@@ -2,7 +2,6 @@
   <div
     class="list"
     :style="{ 'grid-template-columns': `repeat(${columns.length + 2}, 1fr)` }"
-    @paste="pasteExcelToData"
   >
     <div class="list-head">
       选择
@@ -32,6 +31,7 @@
         v-for="column in columns"
         :key="column"
         class="list-body"
+        @paste="pasteExcelToData"
       >
         <DataAction
           :id="item._id"
@@ -42,18 +42,14 @@
         />
       </div>
       <div class="list-body">
-        <input
+        <span
           v-if="item._id"
-          type="button"
-          value="更新"
-          @click="updateList(item)"
-        >
-        <input
+          @click="modalAction(updateList, '更新', item)"
+        >更新</span>
+        <span
           v-else
-          type="button"
-          value="创建"
-          @click="createItem(item)"
-        >
+          @click="modalAction(createItem, '创建', item)"
+        >创建</span>
       </div>
     </template>
   </div>
@@ -63,27 +59,26 @@
     :checked="allChecked"
     @click="allCheck"
   >全选
-  <input
-    type="button"
-    value="+"
+  <button
+    class="function-button"
     @click="createOneList"
   >
-  <input
-    type="button"
-    value="删除"
-    @click="deleteList"
+    +<Tip tip="创建一行新数据" />
+  </button>
+  <button
+    class="function-button"
+    @click="modalAction(deleteList, '删除')"
   >
-  <input
-    type="button"
-    value="创建"
-    @click="createManyItem"
-  >
+    🗑<Tip tip="删除选中数据" />
+  </button>
 
   <ExcelFileButton
     :item-total-symbol="itemTotalSymbol"
     :list-name="listName"
     :many-data-symbol="manyDataSymbol"
     :columns="columns"
+    :create-many-item-symbol="createManyItemSymbol"
+    :list-size="listSize"
   />
 
   <Paging
@@ -93,9 +88,11 @@
 </template>
 
 <script>
-import { computed, onMounted, provide, reactive,
-  ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, provide,
+  ref, watch, watchEffect } from 'vue'
+
 import Service from '../services/CommonService'
+import modal from '../services/modal'
 import Paging from './Paging.vue'
 import Tip from './Tip.vue'
 import DataAction from './DataAction.vue'
@@ -125,12 +122,13 @@ export default {
     const newDataFlag = ref(false)  // 用于新增数据的标识
     const itemTotal   = ref(0)      // 用于记录当前数据总数
 
-    const sourceSymbol = Symbol()
-    const pageSymbol = Symbol()
-    const pageSizeSymbol = Symbol()
-    const itemTotalSymbol = Symbol()
-    const manyDataSymbol = Symbol()
-    const tempListSymbol = Symbol()
+    const sourceSymbol         = Symbol()
+    const pageSymbol           = Symbol()
+    const pageSizeSymbol       = Symbol()
+    const itemTotalSymbol      = Symbol()
+    const manyDataSymbol       = Symbol()
+    const tempListSymbol       = Symbol()
+    const createManyItemSymbol = Symbol()
 
     provide(sourceSymbol, source)
     provide(pageSymbol, page)
@@ -139,10 +137,12 @@ export default {
     provide(manyDataSymbol, manyData)
     provide(tempListSymbol, tempList)
 
+    const modalAction = modal().modalAction
+
     const getAllService = async () => {
       const result = await Service.getAllService(
         props.listName, '{}', page.value, listSize)
-      source.value = result.data;
+      source.value = result.data
       if (newDataFlag.value) {
         source.value.data.push({})
         newDataFlag.value = false
@@ -174,7 +174,11 @@ export default {
       }
     })
     // 观察页数变化
-    watch(page, () => { getAllService() })
+    watch(page, () => {
+      getAllService()
+      checkList.value = []
+      tempList.value = {}
+    })
     // 观察整个列表的内容长度变化
     watchEffect(() => {
       const sourceLength = source.value?.data?.length
@@ -196,8 +200,20 @@ export default {
       e.preventDefault()
       const query = JSON.stringify({ _id: item._id })
       const requestBody = tempList.value[item._id]
-      await Service.updateService(props.listName, query, requestBody)
-      tempList.value = {}
+      const requestBodyKeyLen = Object.keys(requestBody).length
+      if (requestBody !== undefined && requestBodyKeyLen !== 0) {
+        const res =
+          await Service.updateService(props.listName, query, requestBody)
+        const resData = res.data
+        const sourceData = source.value.data
+        const sourceDataLen = sourceData.length
+        for (let index = 0; index < sourceDataLen; index++) {
+          if (sourceData[index]._id === resData._id) {
+            sourceData[index] = resData
+          }
+        }
+        tempList.value = {}
+      }
     }
     // 根据选中列表删除数据(影响模型层和视图层)
     const deleteList = async () => {
@@ -246,16 +262,14 @@ export default {
     }
     // 创建多条数据
     const createManyItem = async () => {
-      const e = event
-      // 阻止事件默认动作和冒泡
-      e.preventDefault()
       const res = await Service.createManyService(
         props.listName, manyData.value)
 
       source.value.data = source.value.data.concat(res.data)
-      document.querySelector('.excelFile').value = ''
-      manyData.value = []
     }
+
+    provide(createManyItemSymbol, createManyItem)
+
     // 黏贴Excel表格的数据到数据列表里
     const pasteExcelToData = async () => {
       const e = event
@@ -282,14 +296,15 @@ export default {
     }
 
     return {
-      source, // 数据需要的属性
+      source,listSize, // 数据需要的属性
       sourceSymbol, pageSymbol, pageSizeSymbol, // Symbol1
-      itemTotalSymbol, // Symbol2
+      itemTotalSymbol, createManyItemSymbol, // Symbol2
       manyDataSymbol, tempListSymbol, // Symbol3
       allChecked, allCheck, checkList, // 选中
       updateList, deleteList, // 删改
-      createItem, createOneList, createManyItem, // 增
+      createItem, createOneList, // 增
       pasteExcelToData, // 和Excel文件以及剪贴板的操作
+      modalAction
     };
   },
 };
@@ -303,11 +318,20 @@ export default {
   background-color: mediumaquamarine;
   line-height: 2em;
   position: relative;
+  border-right: 1px #ccc solid;
 }
 .list-body,
 .list-body span {
   line-height: 1.6em;
   outline: none;
 }
-
+.function-button {
+  font-size: 1.4em;
+  position: relative;
+  margin: 0;
+  line-height: 1em;
+  background-color: transparent;
+  outline: none;
+  border: 0;
+}
 </style>

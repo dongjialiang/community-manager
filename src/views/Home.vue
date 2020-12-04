@@ -23,7 +23,7 @@ export default {
     const manager_list = [
       {
         name: '管理用户信息',
-        link: '',
+        link: 'user',
         subject: '用户信息',
         text: '是小区住户及访客信息管理的模块, 可以预先导入相应的住户信息.',
       },
