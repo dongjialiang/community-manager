@@ -1,90 +1,92 @@
 <template>
-  <div
-    class="list"
-    :style="{ 'grid-template-columns': `repeat(${columns.length + 2}, 1fr)` }"
-  >
-    <div class="list-head">
-      选择
-    </div>
+  <div class="box">
     <div
-      v-for="column in columns"
-      :key="column"
-      class="list-head"
+      class="list"
+      :style="{ 'grid-template-columns': `repeat(${columns.length + 2}, 1fr)` }"
     >
-      {{ column.cn_name }}<Tip :tip="column.tip" />
-    </div>
-    <div class="list-head">
-      操作
-    </div>
-    <template
-      v-for="item in source?.data"
-      :key="item._id"
-    >
-      <div class="list-body">
-        <input
-          v-model="checkList"
-          type="checkbox"
-          :value="item._id"
-        >
+      <div class="list-head">
+        选择
       </div>
       <div
         v-for="column in columns"
         :key="column"
-        class="list-body"
-        @paste="pasteExcelToData"
+        class="list-head"
       >
-        <DataAction
-          :id="item._id"
-          :column="column"
-          :source-symbol="sourceSymbol"
-          :item="item"
-          :temp-list-symbol="tempListSymbol"
-        />
+        {{ column.cn_name }}<Tip :tip="column.tip" />
       </div>
-      <div class="list-body">
-        <span
-          v-if="item._id"
-          @click="modalAction(updateList, '更新', item)"
-        >更新</span>
-        <span
-          v-else
-          @click="modalAction(createItem, '创建', item)"
-        >创建</span>
+      <div class="list-head">
+        操作
       </div>
-    </template>
+      <template
+        v-for="item in source?.data"
+        :key="item._id"
+      >
+        <div class="list-body">
+          <input
+            v-model="checkList"
+            type="checkbox"
+            :value="item._id"
+          >
+        </div>
+        <div
+          v-for="column in columns"
+          :key="column"
+          class="list-body"
+          @paste="pasteExcelToData"
+        >
+          <DataAction
+            :id="item._id"
+            :column="column"
+            :source-symbol="sourceSymbol"
+            :item="item"
+            :temp-list-symbol="tempListSymbol"
+          />
+        </div>
+        <div class="list-body">
+          <span
+            v-if="item._id"
+            @click="modalAction(updateList, '更新', item)"
+          >更新</span>
+          <span
+            v-else
+            @click="modalAction(createItem, '创建', item)"
+          >创建</span>
+        </div>
+      </template>
+    </div>
+
+    <input
+      type="checkbox"
+      :checked="allChecked"
+      @click="allCheck"
+    >全选
+    <button
+      class="function-button"
+      @click="createOneList"
+    >
+      +<Tip tip="创建一行新数据" />
+    </button>
+    <button
+      class="function-button"
+      @click="modalAction(deleteList, '删除')"
+    >
+      🗑<Tip tip="删除选中数据" />
+    </button>
+
+    <ExcelFileButton
+      :item-total-symbol="itemTotalSymbol"
+      :list-name="listName"
+      :many-data-symbol="manyDataSymbol"
+      :columns="columns"
+      :create-many-item-symbol="createManyItemSymbol"
+      :list-size="listSize"
+    />
+
+    <Paging
+      :page-symbol="pageSymbol"
+      :page-size-symbol="pageSizeSymbol"
+    />
   </div>
-
-  <input
-    type="checkbox"
-    :checked="allChecked"
-    @click="allCheck"
-  >全选
-  <button
-    class="function-button"
-    @click="createOneList"
-  >
-    +<Tip tip="创建一行新数据" />
-  </button>
-  <button
-    class="function-button"
-    @click="modalAction(deleteList, '删除')"
-  >
-    🗑<Tip tip="删除选中数据" />
-  </button>
-
-  <ExcelFileButton
-    :item-total-symbol="itemTotalSymbol"
-    :list-name="listName"
-    :many-data-symbol="manyDataSymbol"
-    :columns="columns"
-    :create-many-item-symbol="createManyItemSymbol"
-    :list-size="listSize"
-  />
-
-  <Paging
-    :page-symbol="pageSymbol"
-    :page-size-symbol="pageSizeSymbol"
-  />
 </template>
 
 <script>
@@ -330,8 +332,10 @@ export default {
   position: relative;
   margin: 0;
   line-height: 1em;
-  background-color: transparent;
-  outline: none;
-  border: 0;
+  background-color: var(--main-bg-color);
+  font-weight: bold;
+  box-shadow: inset 0 -.1em 0 rgba(0, 0, 0, .1);
+  border-radius: 50%;
+  color: #fff;
 }
 </style>

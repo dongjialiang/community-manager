@@ -1,10 +1,8 @@
 <template>
-  <div>
-    <DataList
-      :columns="columns"
-      :list-name="listName"
-    />
-  </div>
+  <DataList
+    :columns="columns"
+    :list-name="listName"
+  />
 </template>
 <script>
 import { computed, onMounted, ref } from 'vue';

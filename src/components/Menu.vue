@@ -73,7 +73,7 @@ export default {
   display: flex;
   line-height: 3em;
   font-weight: bold;
-  background-color: #7fffd4;
+  background-color: var(--main-bg-color);
 }
 a {
   color: #fff;
@@ -108,7 +108,6 @@ a {
   border: 0;
   display: block;
   width: 100%;
-  outline: none;
 }
 @media (min-width: 641px) {
   .nav > .nav-list {

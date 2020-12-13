@@ -1,9 +1,12 @@
 <template>
   <div class="box">
     <div
-      v-for="item in manager_list"
-      :key="item.name"
-      class="function"
+      v-for="(item, index) in manager_list"
+      :key="index"
+      :class="`function ${homeList[index % 3]}`"
+      :style="`top: ${6
+        - (index % 3 === 1 ? 5 : 0)
+        + (index / 3 | 0) * 16}em`"
     >
       <h3>{{ item.subject }}</h3>
       <p><b>{{ item.subject }}</b> {{ item.text }}</p>
@@ -78,8 +81,9 @@ export default {
         text: '是小区停车位管理模块, 只有在小区有车库, 停车场, 露天停车位等' +
         '情况下才有管理的需要.',
       },
-    ];
-    return { manager_list };
+    ]
+    const homeList = ['left', 'middle', 'right']
+    return { manager_list, homeList }
   },
 };
 </script>
@@ -107,7 +111,7 @@ export default {
   border-radius: .3em;
   font-size: .9em;
   color: #fff;
-  background-color: #7fffd4;
+  background-color: var(--main-bg-color);
   line-height: 1.4em;
   text-decoration: none;
   box-shadow: inset 0 -.2em 0 rgba(0, 0, 0, .15);
@@ -115,44 +119,16 @@ export default {
 .function > a:hover {
   background-color: #7fdfd4;
 }
-.function:nth-child(1),
-.function:nth-child(4),
-.function:nth-child(7)
-{
+.left {
   left: 1em;
 }
-.function:nth-child(2),
-.function:nth-child(5),
-.function:nth-child(8)
+.middle
 {
   left: calc((100% - 25vw) / 2);
 }
-.function:nth-child(3),
-.function:nth-child(6),
-.function:nth-child(9)
+.right
 {
   right: 1em;
-}
-.function:nth-child(1),
-.function:nth-child(3)
-{
-  top: 6em;
-}
-.function:nth-child(5) {
-  top: 16em;
-}
-.function:nth-child(4),
-.function:nth-child(6)
-{
-  top: 22em;
-}
-.function:nth-child(8) {
-  top: 32em;
-}
-.function:nth-child(7),
-.function:nth-child(9)
-{
-  top: 38em;
 }
 
 @media (max-width: 640px) {

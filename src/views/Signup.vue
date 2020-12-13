@@ -78,14 +78,12 @@ export default {
   box-shadow: 0.1em 0.1em 0.2em #ccc;
   font-weight: 500;
   background: mediumpurple;
-  outline: none;
-  border: none;
   transition: color padding box-shadow cubic-bezier(0.445, 0.05, 0.55, 0.95)
     0.3s;
 }
 .submit:active {
   padding: 0.1em 0 0;
   color: #eee;
-  box-shadow: inset 0.1em 0.1em 0.1em #ccc;
+  box-shadow: inset .1em .1em .1em #ccc;
 }
 </style>

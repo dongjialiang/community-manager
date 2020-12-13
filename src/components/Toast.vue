@@ -34,7 +34,7 @@ export default {
   box-sizing: border-box;
   line-height: 2em;
   width: 30vw;
-  background-color: #7fffd4;
+  background-color: var(--main-bg-color);
   box-shadow: inset 0 -.2em 0 rgba(0, 0, 0, .1);
   pointer-events: all;
   border-radius: .4em;

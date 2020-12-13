@@ -71,21 +71,20 @@
       <i>删除多个</i>
     </div>
     <div
-      v-for="authcheck in item[column.name]"
-      :key="authcheck"
+      v-for="(authNum, authKey) in item[column.name]"
+      :key="authKey"
     >
-      <span class="array-item-name">{{ authcheck.split('-')[0] }}-</span>
+      <span class="array-item-name">{{ authKey }}</span>
       <div
-        v-for="(authNum, index) in getAuthArr(authcheck.split('-')[1])"
+        v-for="(authVal, index) in getAuthArr(authNum)"
         :key="index"
         class="array-item-value"
       >
         <input
           type="checkbox"
-          :value="authNum"
-          :checked="authNum === (2 ** index)"
-          @click="changeListItem(
-            id, column, item, authcheck.split('-')[0], 2 ** index)"
+          :value="authVal"
+          :checked="authVal === (2 ** index)"
+          @click="changeListItem(id, column, item, authKey, 2 ** index)"
         >
       </div>
     </div>
@@ -157,25 +156,13 @@ export default {
         content = e.currentTarget.value
       } else if (type === 'array') {
         const eNum = Number(e.currentTarget.value)
-        let authList = [...item[name]]
         let tempListVal = tempList.value[id]
-        if (tempListVal !== undefined) {
-          if (tempListVal.hasOwnProperty(name)) {
-            authList = tempListVal[name]
-          }
-        }
-        const authListLen = authList.length
-        for (let index = 0; index < authListLen; index++) {
-          const authItem = authList[index]
-          const [authKey, authNum] = authItem.split('-')
-          if (authKey === path) {
-            e.currentTarget.value = eNum > 0
-              ? 0 : fixAuthNum
-            const newNum = eNum < fixAuthNum ? fixAuthNum : -eNum
-            authList[index] = `${authKey}-` +
-            `${Number(authNum) + newNum}`
-          }
-        }
+        const authList = tempListVal !== undefined
+          && tempListVal.hasOwnProperty(name)
+          ? tempListVal[name]
+          : { ...item[name] }
+        const newNum = e.currentTarget.checked ? fixAuthNum : -eNum
+        authList[path] = authList[path] + newNum
         content = authList
       } else {
         content = e.currentTarget.innerText
@@ -219,25 +206,24 @@ export default {
     }
 
     const compare = (first, second) => {
-      if (Array.isArray(first) && Array.isArray(second)) {
-        return first.toString() === second.toString()
+      if (typeof first === 'object' && typeof second === 'object') {
+        return JSON.stringify(first) === JSON.stringify(second)
       } else {
         return first === second
       }
     }
 
-    const getAuthArr = (authVal) => {
-      let authNum = Number(authVal)
+    const getAuthArr = (authNum) => {
       const authArr = []
       let n = 64
-      while (authNum) {
+      while (n > 0) {
         if (authNum >= n) {
           authNum -= n
           authArr.unshift(n)
         } else {
           authArr.unshift(0)
         }
-        n /= 2
+        n = n / 2 | 0
       }
       return authArr
     }
@@ -266,7 +252,7 @@ span {
   display: block;
   width: 100%;
   height: 100%;
-  margin: 0px;
+  margin: 0;
 }
 .checkbox::before {
   display: block;

@@ -1,7 +1,10 @@
 <template>
   <div class="custom-scrollbar">
     <Menu />
-    <router-view />
+    <div class="container">
+      <router-view />
+      <SideBar />
+    </div>
     <Toast v-show="toastVisible" />
     <Modal v-show="modalVisible" />
   </div>
@@ -12,6 +15,7 @@ import { ref, watchEffect } from 'vue'
 import Menu from './components/Menu.vue'
 import Toast from './components/Toast.vue'
 import Modal from './components/Modal.vue'
+import SideBar from './components/SideBar.vue'
 import createStore from './store';
 
 const store = createStore()
@@ -21,7 +25,8 @@ export default {
   components: {
     Menu,
     Toast,
-    Modal
+    Modal,
+    SideBar
   },
   setup() {
     const toastVisible = ref(false)
@@ -39,6 +44,23 @@ export default {
 </script>
 
 <style scoped>
+.container {
+  display: flex;
+  height: 104%;
+}
+.box {
+  flex: 1 1 80%;
+}
+@media (min-width: 769px) {
+  .sidebar {
+    flex: 1 0 20%;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
 .custom-scrollbar {
   height: 100vh;
   overflow-y: scroll;

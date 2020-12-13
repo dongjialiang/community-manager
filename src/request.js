@@ -18,7 +18,7 @@ const useMethod = async (method, path, data) => {
   Nprogress.inc()
   const init = {
     method,
-    headers: {}
+    headers: Object.create(null)
   }
   const token = store.state.token
   if (token !== '') {

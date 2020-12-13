@@ -67,9 +67,9 @@ export default {
 
     // 读取Excel表格文件的数据到数据列表中
     const readExcelToData = () => {
-      const e = event
-      if (e.currentTarget.value !== '') {
-        const file = e.currentTarget.files[0];
+      const eCurrentTarget = event.currentTarget
+      if (eCurrentTarget.value !== '') {
+        const file = eCurrentTarget.files[0];
 
         ManyData.value = []
 
@@ -137,9 +137,6 @@ export default {
       const worksheet = Xlsx.utils.json_to_sheet(resultArr)
       Xlsx.utils.book_append_sheet(workbook, worksheet, dateIndex)
 
-      const randomArr = new Uint8Array(2)
-      const randomVal = crypto.getRandomValues(randomArr)
-
       const timeFile = Intl.DateTimeFormat('cn', {
         timeStyle: 'medium',
         dateStyle: 'short'
@@ -162,7 +159,5 @@ export default {
   margin: 0;
   line-height: 1em;
   background-color: transparent;
-  outline: none;
-  border: 0;
 }
 </style>
