@@ -2,9 +2,15 @@ import request from '../request'
 
 export default {
   async getAllService(name, query = '{}', page = 1, page_size = 24,
-    result_field = '{}') {
-    return await request.get(
-      `${name}/all/${query}/${page}/${page_size}/${result_field}`)
+    result_field = '{}', querystring) {
+    let url = `${name}/all/${query}/${page}/${page_size}/${result_field}`;
+    if (querystring !== undefined) {
+      url += '?'
+      for (const [key, val] of Object.entries(querystring)) {
+        url += `${key}=${val}`
+      }
+    }
+    return await request.get(url)
   },
   async createOneService(name, data) {
     return await request.post(`${name}/`, data)

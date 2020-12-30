@@ -1,75 +1,66 @@
 <template>
   <div class="sidebar">
-    <div
-      v-for="(item, index) in manager_list"
+    <router-link
+      v-for="(item, index) in side_bar_list"
       :key="index"
+      :to="item.link"
+      class="sidebar-link"
     >
-      <router-link :to="item.link">
-        {{ item.name }}
-      </router-link>
-    </div>
+      {{ item.name }}
+    </router-link>
   </div>
 </template>
 
 <script>
+import { ref } from 'vue'
+import ViewFn from '../services/getViewFnList'
+
 export default {
   name: 'SideBar',
   setup() {
-    const manager_list = [
-      {
-        name: '管理用户信息',
-        link: 'user',
-      },
-      {
-        name: '管理商铺活动信息',
-        link: 'businessActivity',
-      },
-      {
-        name: '管理物业通知',
-        link: 'propertyNotice',
-      },
-      {
-        name: '管理生活服务',
-        link: 'lifeService',
-      },
-      {
-        name: '管理出入登记信息',
-        link: 'register',
-      },
-      {
-        name: '管理投诉',
-        link: 'complaint',
-      },
-      {
-        name: '管理报修',
-        link: 'repair',
-      },
-      {
-        name: '管理停车信息',
-        link: 'park',
+    const side_bar_list = ref([])
+    const getSideBarList = async () => {
+      const result = await ViewFn.getViewFnList('all')
+      for (const [key, data] of Object.entries(result.data.data)) {
+        side_bar_list.value.push({ link: key, name: data.name })
       }
-    ]
+    }
+    getSideBarList()
 
-    return { manager_list }
+    return { side_bar_list }
   }
 }
 </script>
 
 <style scoped>
-.sidebar {
-  background-color: rgb(127, 223, 212);
-  height: 100%;
+@media (min-width: 769px) {
+  .sidebar {
+    flex: 1 0 20%;
+  }
+}
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
 }
 a {
-  color: #fff;
+  color: #000;
   text-decoration: none;
   display: block;
   line-height: 2.3em;
   padding: 0 0 0 .8em;
   text-align: left;
-  border-bottom: 1px solid #fff;
 }
 a:hover {
-  background-color: var(--main-bg-color);
+  padding: 0;
+  color: rgb(58, 143, 133);
+  border-left: .3rem solid #fff;
+}
+.sidebar-link {
+  border-left: .3rem solid rgb(1, 148, 128);
+}
+.router-link-active {
+  color: var(--main-bg-color);
+  border-left: .3rem solid var(--main-bg-color);
 }
 </style>

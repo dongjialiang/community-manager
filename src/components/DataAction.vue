@@ -10,13 +10,13 @@
 
   <template v-else-if="column?.type === 'file'">
     <img
-      v-if="item[column.name]"
+      v-if="item[column.name] !== undefined"
       class="banner-img"
       :src="item[column.name]"
     >
     <template v-else>
       <input
-        id="banner"
+        :id="`banner-${id}`"
         type="file"
         name="banner"
         hidden
@@ -24,7 +24,7 @@
       >
       <label
         class="banner"
-        for="banner"
+        :for="`banner-${id}`"
       >上传🖼海报</label>
     </template>
   </template>
@@ -73,6 +73,7 @@
     <div
       v-for="(authNum, authKey) in item[column.name]"
       :key="authKey"
+      class="array-item-body"
     >
       <span class="array-item-name">{{ authKey }}</span>
       <div
@@ -98,7 +99,7 @@
   </span>
   <span
     v-else
-    contenteditable="plaintext-only"
+    contenteditable="true"
     @input="changeListItem(id, column, item)"
   >
     {{ item[column.name] }}
@@ -116,14 +117,6 @@ export default {
       type: String,
       default: undefined
     },
-    sourceSymbol: {
-      type: Symbol,
-      required: true
-    },
-    tempListSymbol: {
-      type: Symbol,
-      required: true
-    },
     column: {
       type: Object,
       required: true
@@ -134,8 +127,8 @@ export default {
     },
   },
   setup(props) {
-    const source   = inject(props.sourceSymbol)
-    const tempList = inject(props.tempListSymbol)
+    const source   = inject(Symbol.for('sourceSymbol'))
+    const tempList = inject(Symbol.for('tempListSymbol'))
 
     const modalAction = modal().modalAction
 
@@ -146,9 +139,7 @@ export default {
       const name = column.name
       const type = column.type
       if (type === 'bool') {
-        e.currentTarget.value =
-                  e.currentTarget.value === 'true'
-                    ? false : true
+        e.currentTarget.value = !(e.currentTarget.value === 'true')
         content = e.currentTarget.value
       } else if (type === 'file') {
         content = path
@@ -172,7 +163,8 @@ export default {
       const itemIsNone = item[name] === undefined
 
       if ((content === '' && itemIsNone)
-        || compare(content, item[name])) {
+        || (tempList.value[id] !== undefined
+        && compare(content, item[name]))) {
         delete tempList.value[id][name]
       } else {
         tempObj[name] = content
@@ -190,7 +182,7 @@ export default {
     const uploadImage = async (id) => {
       const formData = new FormData()
       const bannerDom = await document
-        .querySelector('input[name=\'banner\']')
+        .querySelector(`input[id='banner-${id}']`)
       await formData.append('banner', bannerDom.files[0])
 
       const res = await Upload.imageUpload('image', formData)
@@ -234,24 +226,21 @@ export default {
 
 <style scoped>
 .banner-img {
-  max-width: 8em;
-}
-span {
-  display: block;
-  overflow-wrap: break-word;
-  max-width: 13em;
+  width: 80%;
+  margin: 0 auto;
 }
 .banner {
   border: 1px dotted #000;
   display: block;
   box-sizing: content-box;
-  height: 3.5em;
-  line-height: 3.5em;
+  width: 100%;
+  height: 3em;
+  line-height: 3em;
+  font-size: .8rem;
 }
 .checkbox {
   display: block;
   width: 100%;
-  height: 100%;
   margin: 0;
 }
 .checkbox::before {
@@ -260,22 +249,25 @@ span {
   height: 100%;
 }
 .array-item {
-  width: 20em;
+  width: 14em;
 }
 .array-item-title {
   text-align: right;
 }
 .array-item-title > i {
   writing-mode: vertical-lr;
-  font-size: .9em;
-  width: 1.9em;
+  font-size: .4em;
+  width: 3.2em;
+}
+.array-item-body {
+  font-size: .7rem;
 }
 .array-item-name,
 .array-item-value {
   display: inline-block;
 }
 .array-item-name {
-  width: 8em;
+  min-width: 7.5em;
 }
 .array-item-value {
   width: 1.7em;

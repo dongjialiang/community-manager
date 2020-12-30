@@ -70,6 +70,9 @@ export default {
 
 <style scoped>
 .nav {
+  width: 100vw;
+  position: absolute;
+  z-index: 100;
   display: flex;
   line-height: 3em;
   font-weight: bold;

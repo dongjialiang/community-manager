@@ -46,36 +46,34 @@ export default {
 <style scoped>
 .container {
   display: flex;
-  height: 104%;
+}
+@media (min-width: 641px) {
+  .container {
+    margin: 3rem 0;
+  }
+}
+@media (max-width: 640px) {
+  .container {
+    margin: 0 0 3rem;
+  }
 }
 .box {
   flex: 1 1 80%;
-}
-@media (min-width: 769px) {
-  .sidebar {
-    flex: 1 0 20%;
-  }
-}
-@media (max-width: 768px) {
-  .sidebar {
-    display: none;
-  }
 }
 .custom-scrollbar {
   height: 100vh;
   overflow-y: scroll;
 }
 .custom-scrollbar::-webkit-scrollbar {
-  position: absolute;
   z-index: 8;
   width: .3em;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
   border-radius: 12px;
-  background-color: #fff;
+  background-color: var(--main-bg-color);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(200, 200, 200, .8);
+  background-color: rgba(20, 20, 20, .8);
   border-radius: 12px;
 }
 </style>

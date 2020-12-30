@@ -11,14 +11,16 @@
     >
     <label
       for="import-data-btn"
-    >📥<Tip tip="导入表单数据" /></label>
+    >📥</label>
+    <Tip tip="导入表单数据" />
   </button>
   <button
     class="function-button"
     value="导出"
     @click="modalAction(dataToExcel, '导出数据')"
   >
-    📤<Tip tip="导出表单数据" />
+    📤
+    <Tip tip="导出表单数据" />
   </button>
 </template>
 
@@ -41,27 +43,15 @@ export default {
       type: Array,
       required: true
     },
-    itemTotalSymbol: {
-      type: Symbol,
-      required: true
-    },
-    manyDataSymbol: {
-      type: Symbol,
-      required: true
-    },
-    createManyItemSymbol: {
-      type: Symbol,
-      required: true
-    },
     listSize: {
       type: Number,
       required: true
     }
   },
   setup(props) {
-    const ManyData = inject(props.manyDataSymbol)
-    const itemTotal = inject(props.itemTotalSymbol)
-    const createManyItem = inject(props.createManyItemSymbol)
+    const ManyData       = inject(Symbol.for('manyDataSymbol'))
+    const itemTotal      = inject(Symbol.for('itemTotalSymbol'))
+    const createManyItem = inject(Symbol.for('createManyItemSymbol'))
 
     const modalAction = modal().modalAction
 
@@ -110,7 +100,7 @@ export default {
         JSON.stringify(result_filed))
 
       const workbook = Xlsx.utils.book_new()
-      const cnDateTimeFormat = Intl.DateTimeFormat('cn')
+      const cmnDateTimeFormat = Intl.DateTimeFormat('cmn-Hans-CN')
       let resultArr = []
       let dateIndex
 
@@ -119,7 +109,7 @@ export default {
         for (const key of headers) {
           exportData[key] = v[key]
         }
-        const sheetName = cnDateTimeFormat.format(
+        const sheetName = cmnDateTimeFormat.format(
           Date.parse(exportData['updatedAt'])).replaceAll('/', '-')
         delete exportData['updatedAt']
         if (dateIndex === undefined) {
@@ -137,10 +127,7 @@ export default {
       const worksheet = Xlsx.utils.json_to_sheet(resultArr)
       Xlsx.utils.book_append_sheet(workbook, worksheet, dateIndex)
 
-      const timeFile = Intl.DateTimeFormat('cn', {
-        timeStyle: 'medium',
-        dateStyle: 'short'
-      }).format(Date.now())
+      const timeFile = cmnDateTimeFormat.format(Date.now())
 
       Xlsx.writeFile(workbook, `${timeFile}.xlsx`, {
         bookSST: false,
@@ -159,5 +146,7 @@ export default {
   margin: 0;
   line-height: 1em;
   background-color: transparent;
+  font-weight: bold;
+  border-radius: 50%;
 }
 </style>

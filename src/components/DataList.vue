@@ -12,7 +12,8 @@
         :key="column"
         class="list-head"
       >
-        {{ column.cn_name }}<Tip :tip="column.tip" />
+        {{ column.cn_name }}
+        <Tip :tip="column.tip" />
       </div>
       <div class="list-head">
         操作
@@ -37,9 +38,7 @@
           <DataAction
             :id="item._id"
             :column="column"
-            :source-symbol="sourceSymbol"
             :item="item"
-            :temp-list-symbol="tempListSymbol"
           />
         </div>
         <div class="list-body">
@@ -55,50 +54,61 @@
       </template>
     </div>
 
-    <input
-      type="checkbox"
-      :checked="allChecked"
-      @click="allCheck"
-    >全选
-    <button
-      class="function-button"
-      @click="createOneList"
-    >
-      +<Tip tip="创建一行新数据" />
-    </button>
-    <button
-      class="function-button"
-      @click="modalAction(deleteList, '删除')"
-    >
-      🗑<Tip tip="删除选中数据" />
-    </button>
+    <div class="tool">
+      <input
+        type="checkbox"
+        :checked="allChecked"
+        @click="allCheck"
+      >全选
+      <button
+        class="function-button"
+        @click="createOneList"
+      >
+        +<Tip tip="创建一行新数据" />
+      </button>
+      <button
+        class="function-button"
+        @click="modalAction(deleteList, '删除')"
+      >
+        🗑<Tip tip="删除选中数据" />
+      </button>
+      <ExcelFileButton
+        :list-name="listName"
+        :columns="columns"
+        :list-size="listSize"
+      />
+      <button
+        class="function-button"
+        @click="changeSortIndex(-1)"
+      >
+        ↓<Tip tip="逆序查找信息" />
+      </button>
+      <button
+        class="function-button"
+        @click="changeSortIndex(1)"
+      >
+        ↑<Tip tip="正序查找信息" />
+      </button>
+    </div>
 
-    <ExcelFileButton
-      :item-total-symbol="itemTotalSymbol"
-      :list-name="listName"
-      :many-data-symbol="manyDataSymbol"
-      :columns="columns"
-      :create-many-item-symbol="createManyItemSymbol"
-      :list-size="listSize"
-    />
-
-    <Paging
-      :page-symbol="pageSymbol"
-      :page-size-symbol="pageSizeSymbol"
-    />
+    <Paging />
   </div>
 </template>
 
 <script>
-import { computed, onMounted, provide,
-  ref, watch, watchEffect } from 'vue'
+import { computed, provide, ref, watch, watchEffect } from 'vue'
 
 import Service from '../services/CommonService'
 import modal from '../services/modal'
+
 import Paging from './Paging.vue'
 import Tip from './Tip.vue'
 import DataAction from './DataAction.vue'
 import ExcelFileButton from './ExcelFileButton.vue'
+
+import createStore from '../store'
+const store = createStore()
+
 export default {
   name: 'DataList',
   components: { Paging, Tip, DataAction, ExcelFileButton },
@@ -123,58 +133,58 @@ export default {
     const tempList    = ref({})     // 临时的修改数据存储列表
     const newDataFlag = ref(false)  // 用于新增数据的标识
     const itemTotal   = ref(0)      // 用于记录当前数据总数
+    let   sort_index  = 1
+    const sourceLength = computed(() => source.value?.data?.length)
 
-    const sourceSymbol         = Symbol()
-    const pageSymbol           = Symbol()
-    const pageSizeSymbol       = Symbol()
-    const itemTotalSymbol      = Symbol()
-    const manyDataSymbol       = Symbol()
-    const tempListSymbol       = Symbol()
-    const createManyItemSymbol = Symbol()
-
-    provide(sourceSymbol, source)
-    provide(pageSymbol, page)
-    provide(pageSizeSymbol, pageSize)
-    provide(itemTotalSymbol, itemTotal)
-    provide(manyDataSymbol, manyData)
-    provide(tempListSymbol, tempList)
+    provide(Symbol.for('sourceSymbol'), source)
+    provide(Symbol.for('pageSymbol'), page)
+    provide(Symbol.for('pageSizeSymbol'), pageSize)
+    provide(Symbol.for('itemTotalSymbol'), itemTotal)
+    provide(Symbol.for('manyDataSymbol'), manyData)
+    provide(Symbol.for('tempListSymbol'), tempList)
 
     const modalAction = modal().modalAction
 
     const getAllService = async () => {
       const result = await Service.getAllService(
-        props.listName, '{}', page.value, listSize)
-      source.value = result.data
-      if (newDataFlag.value) {
-        source.value.data.push({})
-        newDataFlag.value = false
-      }
-
+        props.listName, '{}', page.value, listSize,
+        '{}', { sort_index })
+      source.value.data = result?.data.data || []
       itemTotal.value = result.data.total
       pageSize.value = Math.ceil(itemTotal.value / listSize) || 1
+      if (newDataFlag.value) {
+        newDataFlag.value = false
+        if (sourceLength.value > 0 && sourceLength.value < listSize) {
+          source.value.data.push({})
+        }
+      }
     }
-    // 在挂载时请求数据
-    onMounted(getAllService);
+    getAllService() // 请求数据
+    watch(() => props.listName, () => {
+      checkList.value = []
+      tempList.value = {}
+      getAllService()
+    })
 
     // 全选函数
     const allCheck = () => {
       if (allChecked.value) {
-        checkList.value = [];
-      } else {
-        checkList.value = [];
-        for (const data of source.value?.data) {
-          checkList.value.push(data._id);
-        }
+        return checkList.value = [];
       }
-    };
+      checkList.value = [];
+      for (const data of source.value?.data) {
+        checkList.value.push(data._id);
+      }
+    }
+    const changeCheckList = () => {
+      if (checkList.value?.length < sourceLength.value
+        || sourceLength.value === 0) {
+        return allChecked.value = false
+      }
+      allChecked.value = true
+    }
     // 观察列表是否全部选中
-    watch(checkList, () => {
-      if (checkList.value.length !== source.value?.data.length) {
-        allChecked.value = false
-      } else {
-        allChecked.value = true
-      }
-    })
+    watch(checkList, changeCheckList)
     // 观察页数变化
     watch(page, () => {
       getAllService()
@@ -183,15 +193,14 @@ export default {
     })
     // 观察整个列表的内容长度变化
     watchEffect(() => {
-      const sourceLength = source.value?.data?.length
       const pageValue = page.value
 
-      if (sourceLength === 0 && pageValue !== 1) {
+      if (sourceLength.value === 0 && pageValue !== 1) {
         page.value--
-      } else if (sourceLength > 24 && pageValue <= pageSize.value) {
-        page.value = pageValue < pageSize.value
-          ? pageSize.value : pageSize.value + 1
-      } else if (sourceLength < 24 && pageValue < pageSize.value) {
+      } else if (sourceLength.value > listSize && pageValue <= pageSize.value) {
+        pageSize.value += (pageValue === pageSize.value)
+        page.value = pageSize.value
+      } else if (sourceLength.value < listSize && pageValue < pageSize.value) {
         getAllService()
       }
     })
@@ -202,20 +211,23 @@ export default {
       e.preventDefault()
       const query = JSON.stringify({ _id: item._id })
       const requestBody = tempList.value[item._id]
-      const requestBodyKeyLen = Object.keys(requestBody).length
-      if (requestBody !== undefined && requestBodyKeyLen !== 0) {
-        const res =
-          await Service.updateService(props.listName, query, requestBody)
-        const resData = res.data
-        const sourceData = source.value.data
-        const sourceDataLen = sourceData.length
-        for (let index = 0; index < sourceDataLen; index++) {
-          if (sourceData[index]._id === resData._id) {
-            sourceData[index] = resData
-          }
-        }
-        tempList.value = {}
+      if (requestBody === undefined) {
+        return false;
       }
+      const requestBodyKeyLen = Object.keys(requestBody).length
+      if (requestBodyKeyLen === 0) {
+        return false;
+      }
+      const res = await Service
+        .updateService(props.listName, query, requestBody)
+      const resData = res.data
+      const sourceData = source.value.data
+      for (let index = 0; index < sourceLength.value; index++) {
+        if (sourceData[index]._id === resData._id) {
+          sourceData[index] = resData
+        }
+      }
+      tempList.value = {}
     }
     // 根据选中列表删除数据(影响模型层和视图层)
     const deleteList = async () => {
@@ -270,7 +282,7 @@ export default {
       source.value.data = source.value.data.concat(res.data)
     }
 
-    provide(createManyItemSymbol, createManyItem)
+    provide(Symbol.for('createManyItemSymbol'), createManyItem)
 
     // 黏贴Excel表格的数据到数据列表里
     const pasteExcelToData = async () => {
@@ -284,11 +296,11 @@ export default {
       const results = []
       for (const tr of trs) {
         const result = {}
-        let index = 0
+        let tdIndex = 0
         const columns = props.columns
         for (const column of columns) {
           result[column.name] = tr.querySelectorAll('td')
-            .item(index++)?.innerText
+            .item(tdIndex++)?.innerText
         }
         results.push(result)
       }
@@ -296,17 +308,19 @@ export default {
       manyData.value = results
       createManyItem()
     }
+    const changeSortIndex = (new_sort_index) => {
+      sort_index = new_sort_index
+      getAllService()
+    };
 
     return {
       source,listSize, // 数据需要的属性
-      sourceSymbol, pageSymbol, pageSizeSymbol, // Symbol1
-      itemTotalSymbol, createManyItemSymbol, // Symbol2
-      manyDataSymbol, tempListSymbol, // Symbol3
       allChecked, allCheck, checkList, // 选中
       updateList, deleteList, // 删改
       createItem, createOneList, // 增
       pasteExcelToData, // 和Excel文件以及剪贴板的操作
-      modalAction
+      modalAction,
+      changeSortIndex
     };
   },
 };
@@ -322,20 +336,36 @@ export default {
   position: relative;
   border-right: 1px #ccc solid;
 }
-.list-body,
-.list-body span {
-  line-height: 1.6em;
+.list-body {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  border: 1px solid #eee;
+}
+.list-body > span {
+  display: block;
+  overflow-wrap: break-word;
   outline: none;
+  max-width: 13em;
+}
+.list-body > span,
+.list-body > input,
+.list-body > select {
+  font-size: .8rem;
+  flex: 1 1 auto;
 }
 .function-button {
   font-size: 1.4em;
   position: relative;
-  margin: 0;
-  line-height: 1em;
+  margin: 0 .2rem;
+  line-height: 1.4em;
   background-color: var(--main-bg-color);
   font-weight: bold;
   box-shadow: inset 0 -.1em 0 rgba(0, 0, 0, .1);
   border-radius: 50%;
   color: #fff;
+}
+.tool {
+  margin: .5rem 0;
 }
 </style>

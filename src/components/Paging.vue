@@ -23,19 +23,9 @@
 import { inject } from 'vue'
 export default {
   name: 'Paging',
-  props: {
-    pageSymbol: {
-      type: Symbol,
-      required: true
-    },
-    pageSizeSymbol: {
-      type: Symbol,
-      required: true
-    }
-  },
-  setup(props) {
-    const page = inject(props.pageSymbol)
-    const pageSize = inject(props.pageSizeSymbol)
+  setup() {
+    const page     = inject(Symbol.for('pageSymbol'))
+    const pageSize = inject(Symbol.for('pageSizeSymbol'))
     // 上一页
     const prevPage = () => { page.value-- }
     // 下一页

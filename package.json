@@ -4,9 +4,11 @@
   "license": "ISC",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "test": "node src/config/set-env.js node DEBUG=pw:api test/many.test.js"
   },
   "dependencies": {
+    "blueimp-md5": "^2.18.0",
     "nprogress": "^0.2.0",
     "vue": "^3.0.4",
     "vue-router": "^4.0.1",
@@ -16,6 +18,8 @@
     "@vue/compiler-sfc": "^3.0.4",
     "eslint": "^7.15.0",
     "eslint-plugin-vue": "^7.2.0",
+    "playwright": "^1.7.1",
+    "playwright-cli": "^0.171.0",
     "vite": "^1.0.0-rc.13"
   }
 }

@@ -18,70 +18,22 @@
 </template>
 
 <script>
-import { computed } from 'vue';
-
+import { ref } from 'vue'
+import request from '../request'
+import ViewFn from '../services/getViewFnList'
 export default {
   name: 'Home',
   setup() {
-    const manager_list = [
-      {
-        name: '管理用户信息',
-        link: 'user',
-        subject: '用户信息',
-        text: '是小区住户及访客信息管理的模块, 可以预先导入相应的住户信息.',
-      },
-      {
-        name: '管理商铺活动信息',
-        link: 'businessActivity',
-        subject: '商铺活动',
-        text: '是小区周边店铺, 地摊以及流动商铺发出的优惠, 抽奖, ' +
-        '知识竞赛, 收集等可能的活动, 商铺活动最好有海报和开始结束时' +
-        '间, 以及活动的说明事宜.',
-      },
-      {
-        name: '管理物业通知',
-        link: 'propertyNotice',
-        subject: '物业通知',
-        text: '包括维护通知, 业务办理通知, 紧急通知, 宣传通知, ' +
-        '管理人员在此发布的通知可被小区普通用户查看到, 请谨慎发布. ' +
-        '如果通知有误, 应发布新通知, 以免看过旧通知的用户不知道通知的错误.',
-      },
-      {
-        name: '管理生活服务',
-        link: 'lifeService',
-        subject: '生活服务',
-        text: '小区住户或管理员都可以发布生活服务, 可以是修电脑, 修车, ' +
-        '废品回收, 遛狗, 心理辅导等由发布者或专人提供的生活服务.',
-      },
-      {
-        name: '管理出入登记信息',
-        link: 'register',
-        subject: '出入登记信息',
-        text: '是备份用户出入记录信息的管理模块, 主要用于特殊时期人员管控' +
-        ', 登记外来访客出入记录等用途.',
-      },
-      {
-        name: '管理投诉',
-        link: 'complaint',
-        subject: '投诉',
-        text: '是小区住户生活中最为重要的模块, 管理员通过该模块收集用户的' +
-        '意见, 帮助调节住户间的关系, 改善住户生活环境.',
-      },
-      {
-        name: '管理报修',
-        link: 'repair',
-        subject: '报修',
-        text: '是在公共区域或者私人区域有设施损坏时用户提交的报修申请, 由' +
-        '管理员进行审核.',
-      },
-      {
-        name: '管理停车信息',
-        link: 'park',
-        subject: '停车信息',
-        text: '是小区停车位管理模块, 只有在小区有车库, 停车场, 露天停车位等' +
-        '情况下才有管理的需要.',
-      },
-    ]
+    const manager_list = ref([])
+    const getManagerList = async () => {
+      const result = await ViewFn.getViewFnList('all')
+      for (const [key, data] of Object.entries(result.data.data)) {
+        data.link = key
+        manager_list.value.push(data)
+      }
+    }
+    getManagerList()
+
     const homeList = ['left', 'middle', 'right']
     return { manager_list, homeList }
   },

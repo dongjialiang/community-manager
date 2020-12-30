@@ -10,8 +10,8 @@ const store = createStore() // 外部管理状态
 
 /**
  * 发送HTTP请求的方法(具体方法为传入的方法类型)
- * @param {String} method - 请求所用的方法
- * @param {String} path - 请求的网站路径
+ * @param {string} method - 请求所用的方法
+ * @param {string} path - 请求的网站路径
  * @param {Object} data - 要发送的负载数据
  */
 const useMethod = async (method, path, data) => {
@@ -33,10 +33,19 @@ const useMethod = async (method, path, data) => {
   }
   const response = await fetch(`${baseURL}${path}`, init)
 
-  const result = await response.json()
-  if (result) {
+  if (response) {
     Nprogress.done()
+  }
 
+  const result = await response.json()
+
+  if (response.status === 422 && result.message === '用户认证错误.') {
+    store.setToken('')
+    store.setUser('')
+    return;
+  }
+
+  if (result && method !== 'GET') {
     store.setToastMsg(result.message)
     if (toastTimer) {
       clearTimeout(toastTimer)
@@ -44,10 +53,6 @@ const useMethod = async (method, path, data) => {
     toastTimer = setTimeout(() => {
       store.setToastMsg('')
     }, 3000)
-  }
-  if (response.status === 422) {
-    store.setToken(null)
-    store.setUser(null)
   }
   return { data: result, status: response.status }
 }
