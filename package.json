@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "test": "node src/config/set-env.js node DEBUG=pw:api test/many.test.js"
+    "test": "cross-env DEBUG=pw:api node test/many.test.js"
   },
   "dependencies": {
     "blueimp-md5": "^2.18.0",
@@ -15,11 +15,14 @@
     "xlsx": "^0.16.9"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^1.0.5",
     "@vue/compiler-sfc": "^3.0.4",
+    "cross-env": "^7.0.3",
     "eslint": "^7.15.0",
     "eslint-plugin-vue": "^7.2.0",
     "playwright": "^1.7.1",
     "playwright-cli": "^0.171.0",
-    "vite": "^1.0.0-rc.13"
+    "vite": "^2.0.0-beta.19",
+    "vite-plugin-components": "^0.6.3"
   }
 }

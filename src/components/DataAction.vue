@@ -62,12 +62,12 @@
     class="array-item"
   >
     <div class="array-item-title">
-      <i>查询多个</i>
-      <i>查询</i>
-      <i>创建</i>
+      <i>查询一个</i>
+      <i>查询所有</i>
+      <i>创建一个</i>
       <i>创建多个</i>
-      <i>更新</i>
-      <i>删除</i>
+      <i>更新一个</i>
+      <i>删除一个</i>
       <i>删除多个</i>
     </div>
     <div
@@ -75,7 +75,7 @@
       :key="authKey"
       class="array-item-body"
     >
-      <span class="array-item-name">{{ authKey }}</span>
+      <span class="array-item-name">{{ authNameArr[authKey] }}</span>
       <div
         v-for="(authVal, index) in getAuthArr(authNum)"
         :key="index"
@@ -129,6 +129,17 @@ export default {
   setup(props) {
     const source   = inject(Symbol.for('sourceSymbol'))
     const tempList = inject(Symbol.for('tempListSymbol'))
+    const authNameArr = {
+      usermanager: '用户',
+      userPrefill: '用户预填信息',
+      park: '停车',
+      complaint: '投诉',
+      repair: '报修',
+      register: '出入登记',
+      propertyNotice: '物业通知',
+      businessActivity: '商铺活动',
+      lifeService: '生活服务',
+    }
 
     const modalAction = modal().modalAction
 
@@ -219,7 +230,7 @@ export default {
       }
       return authArr
     }
-    return { uploadImage, changeListItem, modalAction, getAuthArr }
+    return { uploadImage, changeListItem, modalAction, getAuthArr, authNameArr }
   }
 }
 </script>

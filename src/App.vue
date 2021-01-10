@@ -22,12 +22,6 @@ const store = createStore()
 
 export default {
   name: 'App',
-  components: {
-    Menu,
-    Toast,
-    Modal,
-    SideBar
-  },
   setup() {
     const toastVisible = ref(false)
     const modalVisible = ref(false)

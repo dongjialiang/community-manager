@@ -12,9 +12,6 @@ import { useRoute } from 'vue-router'
 
 export default {
   name: 'DataView',
-  components: {
-    DataList,
-  },
   setup() {
     const route = useRoute()
     const columns = ref([])

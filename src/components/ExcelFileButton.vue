@@ -12,7 +12,7 @@
     <label
       for="import-data-btn"
     >📥</label>
-    <Tip tip="导入表单数据" />
+    <Tip tip="导入表格数据" />
   </button>
   <button
     class="function-button"
@@ -20,7 +20,7 @@
     @click="modalAction(dataToExcel, '导出数据')"
   >
     📤
-    <Tip tip="导出表单数据" />
+    <Tip tip="导出表格数据" />
   </button>
 </template>
 
@@ -33,7 +33,6 @@ import Tip from './Tip.vue'
 
 export default {
   name: 'ExcelFileButton',
-  components: { Tip },
   props: {
     listName: {
       type: String,
@@ -99,37 +98,37 @@ export default {
         props.listName, '{}', 1, itemTotal.value + props.listSize,
         JSON.stringify(result_filed))
 
-      const workbook = Xlsx.utils.book_new()
-      const cmnDateTimeFormat = Intl.DateTimeFormat('cmn-Hans-CN')
-      let resultArr = []
-      let dateIndex
-
-      const result = res.data.data.map((v) => {
-        const exportData = {}
-        for (const key of headers) {
-          exportData[key] = v[key]
+      const workbook = Xlsx.utils.book_new() // 创建工作簿
+      const cmnDateFormat = Intl.DateTimeFormat('cmn-Hans-CN') // 创建日期格式对象
+      const resultDataArr = res.data.data // 获取结果数组
+      const tempWorkBook = {} // 临时工作簿
+      const result = resultDataArr.map((exportData) => { // 遍历所有信息
+        const sheetName = cmnDateFormat.format(
+          Date.parse(exportData['updatedAt'])
+        ).replaceAll('/', '-') // 根据最后更新时间创建工作表名(具体到天)
+        delete exportData['updatedAt'] // 删除最后更新时间属性
+        if (tempWorkBook[sheetName] === undefined) { // 如果临时工作表不存在
+          tempWorkBook[sheetName] = [] // 创建临时工作表
         }
-        const sheetName = cmnDateTimeFormat.format(
-          Date.parse(exportData['updatedAt'])).replaceAll('/', '-')
-        delete exportData['updatedAt']
-        if (dateIndex === undefined) {
-          dateIndex = sheetName
-          resultArr.push(exportData)
-        } else if (dateIndex === sheetName) {
-          resultArr.push(exportData)
-        } else if (dateIndex !== sheetName) {
-          const worksheet = Xlsx.utils.json_to_sheet(resultArr)
-          Xlsx.utils.book_append_sheet(workbook, worksheet, dateIndex)
-          resultArr = [exportData]
-          dateIndex = sheetName
-        }
+        delete exportData._id
+        tempWorkBook[sheetName].push(exportData) // 存入表格数组
       })
-      const worksheet = Xlsx.utils.json_to_sheet(resultArr)
-      Xlsx.utils.book_append_sheet(workbook, worksheet, dateIndex)
+      for (const key in tempWorkBook) { // 遍历临时工作簿的表名
+        let worksheet; // 存放工作表的变量
+        if (tempWorkBook.hasOwnProperty(key)) { // 如果有表名
+          const resultArr = tempWorkBook[key] // 表格数组
+          worksheet = Xlsx.utils.json_to_sheet(resultArr) // 转为工作表
+        }
+        Xlsx.utils.book_append_sheet(workbook, worksheet, key) // 把工作表添加入工作簿中
+      }
 
-      const timeFile = cmnDateTimeFormat.format(Date.now())
+      const timeFile = Intl.DateTimeFormat('cmn-Hans-CN', {
+        year: 'numeric', month: 'numeric', day: 'numeric',
+        hour: 'numeric', minute: 'numeric', second: 'numeric',
+        hour12: false
+      }).format(Date.now()) // 根据当前时间创建Excel表名(精确到秒)
 
-      Xlsx.writeFile(workbook, `${timeFile}.xlsx`, {
+      Xlsx.writeFile(workbook, `${timeFile}.xlsx`, { // 生成Excel表格
         bookSST: false,
         type: 'base64'
       })

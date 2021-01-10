@@ -10,6 +10,5 @@ import UserManager from '../components/UserManager.vue'
 
 export default {
   name: 'Login',
-  components: { UserManager }
 }
 </script>

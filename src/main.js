@@ -4,8 +4,7 @@ import router from './router'
 import store from './store'
 import './index.css'
 
-const app = createApp(App)
-app
+createApp(App)
   .use(router)
   .use(store)
   .mount('#app')

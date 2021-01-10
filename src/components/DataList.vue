@@ -33,8 +33,8 @@
           v-for="column in columns"
           :key="column"
           class="list-body"
-          @paste="pasteExcelToData"
         >
+          <!-- @paste="pasteExcelToData" -->
           <DataAction
             :id="item._id"
             :column="column"
@@ -111,7 +111,6 @@ const store = createStore()
 
 export default {
   name: 'DataList',
-  components: { Paging, Tip, DataAction, ExcelFileButton },
   props: {
     columns: {
       type: Array,

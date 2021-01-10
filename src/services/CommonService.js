@@ -13,13 +13,13 @@ export default {
     return await request.get(url)
   },
   async createOneService(name, data) {
-    return await request.post(`${name}/`, data)
+    return await request.post(`${name}/one`, data)
   },
   async createManyService(name, data) {
     return await request.post(`${name}/many`, data)
   },
   async updateService(name, query, data, result_field = '{}') {
-    return await request.put(`${name}/${query}/${result_field}`, data)
+    return await request.put(`${name}/one/${query}/${result_field}`, data)
   },
   async deleteManyService(name, query, result_field = '{}') {
     return await request.delete(`${name}/many/${query}/${result_field}`)
