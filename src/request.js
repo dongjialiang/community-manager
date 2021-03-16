@@ -3,9 +3,7 @@ import createStore from './store'
 import Nprogress from 'nprogress'
 import 'nprogress/nprogress.css'
 
-// const baseURL = 'http://localhost:3001/'
-// const baseURL = 'http://103.152.132.21/'
-const baseURL = 'http://106.75.49.57/'
+const baseURL = import.meta.env.VITE_BASE_URL
 
 let toastTimer
 

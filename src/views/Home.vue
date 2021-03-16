@@ -4,12 +4,13 @@
       v-for="(item, index) in manager_list"
       :key="index"
       :class="`function ${homeList[index % 3]}`"
-      :style="`top: ${6
-        - (index % 3 === 1 ? 5 : 0)
-        + (index / 3 | 0) * 16}em`"
+      :style="`top: ${6 - (index % 3 === 1 ? 5 : 0) + (index / 3 | 0) * 16}em`"
     >
       <h3>{{ item.subject }}</h3>
-      <p><b>{{ item.subject }}</b> {{ item.text }}</p>
+      <p>
+        <b>{{ item.subject }}</b>
+        {{ item.text }}
+      </p>
       <router-link :to="item.link">
         {{ item.name }}
       </router-link>
@@ -19,7 +20,6 @@
 
 <script>
 import { ref } from 'vue'
-import request from '../request'
 import ViewFn from '../services/getViewFnList'
 export default {
   name: 'Home',

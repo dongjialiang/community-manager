@@ -44,11 +44,11 @@
         <div class="list-body">
           <span
             v-if="item._id"
-            @click="modalAction(updateList, '更新', item)"
+            @click.prevent="modalAction(updateList, '更新', item)"
           >更新</span>
           <span
             v-else
-            @click="modalAction(createItem, '创建', item)"
+            @click.prevent="modalAction(createItem, '创建', item)"
           >创建</span>
         </div>
       </template>
@@ -58,17 +58,17 @@
       <input
         type="checkbox"
         :checked="allChecked"
-        @click="allCheck"
+        @click.prevent="allCheck"
       >全选
       <button
         class="function-button"
-        @click="createOneList"
+        @click.prevent="createOneList"
       >
         +<Tip tip="创建一行新数据" />
       </button>
       <button
         class="function-button"
-        @click="modalAction(deleteList, '删除')"
+        @click.prevent="modalAction(deleteList, '删除')"
       >
         🗑<Tip tip="删除选中数据" />
       </button>
@@ -79,13 +79,13 @@
       />
       <button
         class="function-button"
-        @click="changeSortIndex(-1)"
+        @click.prevent="changeSortIndex(-1)"
       >
         ↓<Tip tip="逆序查找信息" />
       </button>
       <button
         class="function-button"
-        @click="changeSortIndex(1)"
+        @click.prevent="changeSortIndex(1)"
       >
         ↑<Tip tip="正序查找信息" />
       </button>
@@ -106,11 +106,14 @@ import Tip from './Tip.vue'
 import DataAction from './DataAction.vue'
 import ExcelFileButton from './ExcelFileButton.vue'
 
-import createStore from '../store'
-const store = createStore()
-
 export default {
   name: 'DataList',
+  components: {
+    Paging,
+    Tip,
+    DataAction,
+    ExcelFileButton
+  },
   props: {
     columns: {
       type: Array,
@@ -205,9 +208,6 @@ export default {
     })
     // 更新列表内容的函数(发送更改请求, 会影响模型层)
     const updateList = async (item) => {
-      const e = event
-      // 阻止事件默认动作和冒泡
-      e.preventDefault()
       const query = JSON.stringify({ _id: item._id })
       const requestBody = tempList.value[item._id]
       if (requestBody === undefined) {
@@ -230,9 +230,6 @@ export default {
     }
     // 根据选中列表删除数据(影响模型层和视图层)
     const deleteList = async () => {
-      const e = event
-      // 阻止事件默认动作和冒泡
-      e.preventDefault()
       const res = await Service.deleteManyService(
         props.listName,
         JSON.stringify({ _id: { $in: checkList.value } }))
@@ -250,9 +247,6 @@ export default {
     }
     // 创建数据(影响模型层和视图层)
     const createItem = async (item) => {
-      const e = event
-      // 阻止事件默认动作和冒泡
-      e.preventDefault()
       const requestBody = tempList.value[item._id]
       const res = await Service.createOneService(
         props.listName, requestBody)
@@ -265,9 +259,6 @@ export default {
     }
     // 创建一行(只影响视图层)
     const createOneList = () => {
-      const e = event
-      // 阻止事件默认动作和冒泡
-      e.preventDefault()
       if (newDataFlag.value !== true) {
         newDataFlag.value = true
         source.value?.data.push({})
@@ -284,29 +275,25 @@ export default {
     provide(Symbol.for('createManyItemSymbol'), createManyItem)
 
     // 黏贴Excel表格的数据到数据列表里
-    const pasteExcelToData = async () => {
-      const e = event
-      // 阻止事件默认动作(这里是黏贴事件)和冒泡
-      e.preventDefault()
+    // const pasteExcelToData = async () => {
+    //   const html = e.clipboardData.getData('text/html')
+    //   const dom = new DOMParser().parseFromString(html, 'text/html')
+    //   const trs = Array.from(dom.querySelectorAll('table tr'))
+    //   const results = []
+    //   for (const tr of trs) {
+    //     const result = {}
+    //     let tdIndex = 0
+    //     const columns = props.columns
+    //     for (const column of columns) {
+    //       result[column.name] = tr.querySelectorAll('td')
+    //         .item(tdIndex++)?.innerText
+    //     }
+    //     results.push(result)
+    //   }
 
-      const html = e.clipboardData.getData('text/html')
-      const dom = new DOMParser().parseFromString(html, 'text/html')
-      const trs = Array.from(dom.querySelectorAll('table tr'))
-      const results = []
-      for (const tr of trs) {
-        const result = {}
-        let tdIndex = 0
-        const columns = props.columns
-        for (const column of columns) {
-          result[column.name] = tr.querySelectorAll('td')
-            .item(tdIndex++)?.innerText
-        }
-        results.push(result)
-      }
-
-      manyData.value = results
-      createManyItem()
-    }
+    //   manyData.value = results
+    //   createManyItem()
+    // }
     const changeSortIndex = (new_sort_index) => {
       sort_index = new_sort_index
       getAllService()
@@ -317,7 +304,7 @@ export default {
       allChecked, allCheck, checkList, // 选中
       updateList, deleteList, // 删改
       createItem, createOneList, // 增
-      pasteExcelToData, // 和Excel文件以及剪贴板的操作
+      // pasteExcelToData, // 和Excel文件以及剪贴板的操作
       modalAction,
       changeSortIndex
     };

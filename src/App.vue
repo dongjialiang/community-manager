@@ -2,7 +2,14 @@
   <div class="custom-scrollbar">
     <Menu />
     <div class="container">
-      <router-view />
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component
+            :is="Component"
+            class="view"
+          />
+        </keep-alive>
+      </router-view>
       <SideBar />
     </div>
     <Toast v-show="toastVisible" />
@@ -22,6 +29,7 @@ const store = createStore()
 
 export default {
   name: 'App',
+  components: { Menu, Toast, Modal, SideBar },
   setup() {
     const toastVisible = ref(false)
     const modalVisible = ref(false)

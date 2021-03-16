@@ -26,13 +26,13 @@
 
 <script>
 import { inject } from 'vue'
-import Xlsx from 'xlsx'
 import Service from '../services/CommonService'
 import modal from '../services/modal'
 import Tip from './Tip.vue'
 
 export default {
   name: 'ExcelFileButton',
+  components: { Tip },
   props: {
     listName: {
       type: String,
@@ -55,7 +55,7 @@ export default {
     const modalAction = modal().modalAction
 
     // 读取Excel表格文件的数据到数据列表中
-    const readExcelToData = () => {
+    const readExcelToData = (event) => {
       const eCurrentTarget = event.currentTarget
       if (eCurrentTarget.value !== '') {
         const file = eCurrentTarget.files[0];
@@ -68,17 +68,17 @@ export default {
           // 获取二进制串数据
           const data = ev.currentTarget.result
           // 读取文件
-          const workbook = Xlsx.read(data, { type: 'binary' })
+          const workbook = XLSX.read(data, { type: 'binary' })
           const sheetLength = workbook.SheetNames.length
 
           for (let index = 0; index < sheetLength; index++) {
             const sheetName = workbook.SheetNames[index];
-            const sheet = Xlsx.utils.sheet_to_json(
+            const sheet = XLSX.utils.sheet_to_json(
               workbook.Sheets[sheetName])
             ManyData.value.push(...sheet)
           }
         }
-        fileReader.onloadend = (ev) => {
+        fileReader.onloadend = () => {
           modalAction(createManyItem, '导入文件数据')
           document.querySelector('.excelFile').value = ''
         }
@@ -98,11 +98,11 @@ export default {
         props.listName, '{}', 1, itemTotal.value + props.listSize,
         JSON.stringify(result_filed))
 
-      const workbook = Xlsx.utils.book_new() // 创建工作簿
+      const workbook = XLSX.utils.book_new() // 创建工作簿
       const cmnDateFormat = Intl.DateTimeFormat('cmn-Hans-CN') // 创建日期格式对象
       const resultDataArr = res.data.data // 获取结果数组
       const tempWorkBook = {} // 临时工作簿
-      const result = resultDataArr.map((exportData) => { // 遍历所有信息
+      resultDataArr.map((exportData) => { // 遍历所有信息
         const sheetName = cmnDateFormat.format(
           Date.parse(exportData['updatedAt'])
         ).replaceAll('/', '-') // 根据最后更新时间创建工作表名(具体到天)
@@ -117,9 +117,9 @@ export default {
         let worksheet; // 存放工作表的变量
         if (tempWorkBook.hasOwnProperty(key)) { // 如果有表名
           const resultArr = tempWorkBook[key] // 表格数组
-          worksheet = Xlsx.utils.json_to_sheet(resultArr) // 转为工作表
+          worksheet = XLSX.utils.json_to_sheet(resultArr) // 转为工作表
         }
-        Xlsx.utils.book_append_sheet(workbook, worksheet, key) // 把工作表添加入工作簿中
+        XLSX.utils.book_append_sheet(workbook, worksheet, key) // 把工作表添加入工作簿中
       }
 
       const timeFile = Intl.DateTimeFormat('cmn-Hans-CN', {
@@ -128,7 +128,7 @@ export default {
         hour12: false
       }).format(Date.now()) // 根据当前时间创建Excel表名(精确到秒)
 
-      Xlsx.writeFile(workbook, `${timeFile}.xlsx`, { // 生成Excel表格
+      XLSX.writeFile(workbook, `${timeFile}.xlsx`, { // 生成Excel表格
         bookSST: false,
         type: 'base64'
       })

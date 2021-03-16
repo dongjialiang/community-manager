@@ -95,8 +95,8 @@ export default {
     const locationList = ref([])
 
     const qqMapApi = 'https://apis.map.qq.com'
-    const key = import.meta.env.VITE_LOCATION_APPID
-    const signKey = import.meta.env.VITE_LOCATION_SIGNKEY
+    const key = import.meta.env.VITE_APPID
+    const signKey = import.meta.env.VITE_SIGNKEY
     const output = 'jsonp'
     const region = '东莞'
     const getParamsUrl = (paramsApi, params) => {

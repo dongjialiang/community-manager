@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { provide, ref, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import createStore from '../store'
 
 const store = createStore()

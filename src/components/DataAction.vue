@@ -12,7 +12,7 @@
     <img
       v-if="item[column.name] !== undefined"
       class="banner-img"
-      :src="item[column.name]"
+      :src="baseURL + item[column.name]"
     >
     <template v-else>
       <input
@@ -107,9 +107,10 @@
 </template>
 
 <script>
-import { inject, watchEffect } from 'vue'
+import { inject } from 'vue'
 import modal from '../services/modal'
 import Upload from '../services/Upload'
+
 export default {
   name: 'DataAction',
   props: {
@@ -129,6 +130,7 @@ export default {
   setup(props) {
     const source   = inject(Symbol.for('sourceSymbol'))
     const tempList = inject(Symbol.for('tempListSymbol'))
+    const baseURL = import.meta.env.VITE_BASE_URL
     const authNameArr = {
       usermanager: '用户',
       userPrefill: '用户预填信息',
@@ -230,7 +232,10 @@ export default {
       }
       return authArr
     }
-    return { uploadImage, changeListItem, modalAction, getAuthArr, authNameArr }
+    return {
+      uploadImage, changeListItem, modalAction,
+      getAuthArr, authNameArr, baseURL
+    }
   }
 }
 </script>

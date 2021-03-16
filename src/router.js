@@ -14,47 +14,47 @@ const router = createRouter({
     },
     {
       path: '/lifeService',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/LifeService.vue'),
       meta: { title: '生活服务' }
     },
     {
       path: '/businessActivity',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/BusinessActivity.vue'),
       meta: { title: '商铺活动' }
     },
     {
       path: '/propertyNotice',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/PropertyNotice.vue'),
       meta: { title: '物业通知' }
     },
     {
       path: '/park',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/Park.vue'),
       meta: { title: '停车信息' }
     },
     {
       path: '/register',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/Register.vue'),
       meta: { title: '出入登记' }
     },
     {
       path: '/repair',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/Repair.vue'),
       meta: { title: '报修' }
     },
     {
       path: '/complaint',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/Complaint.vue'),
       meta: { title: '投诉' }
     },
     {
       path: '/usermanager',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/Usermanager.vue'),
       meta: { title: '用户信息' }
     },
     {
       path: '/userPrefill',
-      component: () => import('./views/DataView.vue'),
+      component: () => import('./views/UserPrefill.vue'),
       meta: { title: '用户信息' }
     },
     {
