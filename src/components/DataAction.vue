@@ -12,7 +12,8 @@
     <img
       v-if="item[column.name] !== undefined"
       class="banner-img"
-      :src="baseURL + item[column.name]"
+      :src="item[column.name].startsWith('http')
+        ? item[column.name] : baseURL + item[column.name]"
     >
     <template v-else>
       <input
