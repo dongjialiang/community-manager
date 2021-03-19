@@ -1,16 +1,8 @@
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
-import fs from 'fs'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  server: {
-    https: {
-      key: fs.readFileSync('./192.168.75.1-key.pem'),
-      cert: fs.readFileSync('./192.168.75.1.pem'),
-      ca: fs.readFileSync('C:/Users/liang/AppData/Local/mkcert/rootCA.pem')
-    }
-  },
   plugins: [
     Vue(),
     VitePWA({
