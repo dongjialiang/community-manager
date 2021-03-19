@@ -1,73 +1,35 @@
 // 从vue的路由管理器导入创建路由函数和历史
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 // 导入页面视图文件
-import Home from './views/Home.vue'
+const pages = import.meta.glob('./views/*.vue')
+const titles = {
+  '/home': '首页',
+  '/lifeservice': '生活服务',
+  '/businessactivity': '商铺活动',
+  '/propertynotice': '物业通知',
+  '/park': '停车信息',
+  '/register': '出入登记',
+  '/repair': '报修',
+  '/complaint': '投诉',
+  '/usermanager': '用户信息',
+  '/userprefill': '预填信息',
+  '/signup': '注册',
+  '/login': '登录'
+}
+
+const routes = Object.keys(pages).map((path) => {
+  const name = path.match(/\.\/views(.*)\.vue$/)[1].toLowerCase()
+  return {
+    path: name === '/home' ? '/' : name,
+    alias: name,
+    component: pages[path], // () => import('./views/*.vue')
+    meta: { title: titles[name] }
+  }
+})
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes: [
-    {
-      path: '/',
-      alias: '/home',
-      component: Home,
-      meta: { title: '主页' }
-    },
-    {
-      path: '/lifeService',
-      component: () => import('./views/LifeService.vue'),
-      meta: { title: '生活服务' }
-    },
-    {
-      path: '/businessActivity',
-      component: () => import('./views/BusinessActivity.vue'),
-      meta: { title: '商铺活动' }
-    },
-    {
-      path: '/propertyNotice',
-      component: () => import('./views/PropertyNotice.vue'),
-      meta: { title: '物业通知' }
-    },
-    {
-      path: '/park',
-      component: () => import('./views/Park.vue'),
-      meta: { title: '停车信息' }
-    },
-    {
-      path: '/register',
-      component: () => import('./views/Register.vue'),
-      meta: { title: '出入登记' }
-    },
-    {
-      path: '/repair',
-      component: () => import('./views/Repair.vue'),
-      meta: { title: '报修' }
-    },
-    {
-      path: '/complaint',
-      component: () => import('./views/Complaint.vue'),
-      meta: { title: '投诉' }
-    },
-    {
-      path: '/usermanager',
-      component: () => import('./views/Usermanager.vue'),
-      meta: { title: '用户信息' }
-    },
-    {
-      path: '/userPrefill',
-      component: () => import('./views/UserPrefill.vue'),
-      meta: { title: '用户信息' }
-    },
-    {
-      path: '/signup',
-      component: () => import('./views/Signup.vue'),
-      meta: { title: '注册' }
-    },
-    {
-      path: '/login',
-      component: () => import('./views/Login.vue'),
-      meta: { title: '登录' }
-    },
-  ]
+  history: createWebHistory(),
+  routes
 })
 
 router.beforeEach((to, from, next) => {
