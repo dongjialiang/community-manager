@@ -7,7 +7,7 @@ rules:
     - 2
   linebreak-style: # LF风格的换行(\n)
     - error
-    - windows
+    - unix
   space-before-blocks: # 块前无空格报错
     - error
   no-trailing-spaces: # 结束有空格报错

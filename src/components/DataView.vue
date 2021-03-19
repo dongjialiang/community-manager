@@ -14,19 +14,16 @@ export default {
   name: 'DataView',
   components: { DataList },
   setup() {
-    const route = useRoute()
+    const path = useRoute().path
     const columns = ref([])
-    const listName = computed(() => route.path.slice(1))
-    const viewFnList = async () => {
-      const result = await ViewFn.getViewFnList(listName.value)
-      if (result.data.data) {
-        columns.value = result.data.data.columns
+    const listName = computed(() => path !== 'home' && path.slice(1))
+    const viewFnList = async (viewFn) => {
+      const result = (await ViewFn.getViewFnList(viewFn)).data.data
+      if (result) {
+        columns.value = result.columns
       }
     }
-    watchEffect(() => {
-      listName.value
-      viewFnList()
-    })
+    watchEffect(() => { viewFnList(listName.value) })
 
     return { columns, listName }
   },

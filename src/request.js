@@ -43,7 +43,7 @@ const useMethod = async (method, path, data) => {
   if (response.status === 422 && result.message === '用户认证错误.') {
     store.setToken('')
     store.setUser('')
-    return;
+    return
   }
 
   if (result && method !== 'GET') {

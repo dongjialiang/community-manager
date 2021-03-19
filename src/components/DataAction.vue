@@ -5,7 +5,7 @@
     class="checkbox"
     :value="item[column.name]"
     :checked="item[column.name]"
-    @click="changeListItem(id, column, item)"
+    @click="changeListItem($event, id, column, item)"
   >
 
   <template v-else-if="column?.type === 'file'">
@@ -40,14 +40,14 @@
       :name="`radio${item._id || 'new'}`"
       :value="option"
       :checked="item[column.name] === option"
-      @change="changeListItem(id, column, item)"
+      @change="changeListItem($event, id, column, item)"
     >{{ option }}
   </template>
 
   <select
     v-else-if="column?.type === 'select'"
     :value="item[column.name]"
-    @input="changeListItem(id, column, item)"
+    @input="changeListItem($event, id, column, item)"
   >
     <option
       v-for="option in column?.options"
@@ -63,13 +63,8 @@
     class="array-item"
   >
     <div class="array-item-title">
-      <i>查询一个</i>
-      <i>查询所有</i>
-      <i>创建一个</i>
-      <i>创建多个</i>
-      <i>更新一个</i>
-      <i>删除一个</i>
-      <i>删除多个</i>
+      <i>查询一个</i><i>查询所有</i><i>创建一个</i><i>创建多个</i>
+      <i>更新一个</i><i>删除一个</i><i>删除多个</i>
     </div>
     <div
       v-for="(authNum, authKey) in item[column.name]"
@@ -86,7 +81,7 @@
           type="checkbox"
           :value="authVal"
           :checked="authVal === (2 ** index)"
-          @click="changeListItem(id, column, item, authKey, 2 ** index)"
+          @click="changeListItem($event, id, column, item, authKey, 2 ** index)"
         >
       </div>
     </div>
@@ -94,14 +89,14 @@
 
   <span
     v-else-if="column.type === 'bool'"
-    @input="changeListItem(id, column, item)"
+    @input="changeListItem($event, id, column, item)"
   >
     {{ item[column.name] }}
   </span>
   <span
     v-else
     contenteditable="true"
-    @input="changeListItem(id, column, item)"
+    @input="changeListItem($event, id, column, item)"
   >
     {{ item[column.name] }}
   </span>
@@ -147,11 +142,9 @@ export default {
     const modalAction = modal().modalAction
 
     // 修改列表内容(只影响视图层, 不修改模型层)
-    const changeListItem = (id, column, item, path, fixAuthNum) => {
+    const changeListItem = (e, id, column, item, path, fixAuthNum) => {
       let content;
-      const e = event;
-      const name = column.name
-      const type = column.type
+      const { name, type } = column
       if (type === 'bool') {
         e.currentTarget.value = !(e.currentTarget.value === 'true')
         content = e.currentTarget.value
@@ -163,7 +156,7 @@ export default {
         const eNum = Number(e.currentTarget.value)
         let tempListVal = tempList.value[id]
         const authList = tempListVal !== undefined
-          && tempListVal.hasOwnProperty(name)
+          && Object.prototype.hasOwnProperty.call(tempListVal, name)
           ? tempListVal[name]
           : { ...item[name] }
         const newNum = e.currentTarget.checked ? fixAuthNum : -eNum
@@ -204,7 +197,7 @@ export default {
         for (const data of source.value.data) {
           if (data._id === id) {
             data.banner = res.data.path
-            changeListItem(id, props.column, data, data.banner)
+            changeListItem(e, id, props.column, data, data.banner)
             break
           }
         }
