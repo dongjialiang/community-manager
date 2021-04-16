@@ -6,6 +6,7 @@ body {
   padding: 0;
 }
 #app {
+  font-display: optional;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

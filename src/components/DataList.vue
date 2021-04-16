@@ -42,14 +42,20 @@
           />
         </div>
         <div class="list-body">
-          <span
+          <button
             v-if="item._id"
-            @click.prevent="modalAction(updateList, '更新', item)"
-          >更新</span>
-          <span
+            class="update-btn"
+            @click="modalAction(updateList, '更新', item)"
+          >
+            更新
+          </button>
+          <button
             v-else
-            @click.prevent="modalAction(createItem, '创建', item)"
-          >创建</span>
+            class="create-btn"
+            @click="modalAction(createItem, '创建', item)"
+          >
+            创建
+          </button>
         </div>
       </template>
     </div>
@@ -58,17 +64,17 @@
       <input
         type="checkbox"
         :checked="allChecked"
-        @click.prevent="allCheck"
+        @click="allCheck"
       >全选
       <button
         class="function-button"
-        @click.prevent="createOneList"
+        @click="createOneList"
       >
         +<Tip tip="创建一行新数据" />
       </button>
       <button
         class="function-button"
-        @click.prevent="modalAction(deleteList, '删除')"
+        @click="modalAction(deleteList, '删除')"
       >
         🗑<Tip tip="删除选中数据" />
       </button>
@@ -79,13 +85,13 @@
       />
       <button
         class="function-button"
-        @click.prevent="changeSortIndex(-1)"
+        @click="changeSortIndex(-1)"
       >
         ↓<Tip tip="逆序查找信息" />
       </button>
       <button
         class="function-button"
-        @click.prevent="changeSortIndex(1)"
+        @click="changeSortIndex(1)"
       >
         ↑<Tip tip="正序查找信息" />
       </button>
@@ -219,6 +225,9 @@ export default {
       }
       const res = await Service
         .updateService(props.listName, query, requestBody)
+      if (res.status === 200) {
+        updateActionNodeBg()
+      }
       const resData = res.data
       const sourceData = source.value.data
       for (let index = 0; index < sourceLength.value; index++) {
@@ -250,10 +259,12 @@ export default {
       const requestBody = tempList.value[item._id]
       const res = await Service.createOneService(
         props.listName, requestBody)
+      if (res.status === 200) {
+        updateActionNodeBg()
+      }
 
       newDataFlag.value = false
-      source.value.data.pop()
-      source.value.data.push(res.data)
+      source.value.data[sourceLength.value - 1] = res.data.data
 
       delete tempList.value[item._id]
     }
@@ -268,8 +279,11 @@ export default {
     const createManyItem = async () => {
       const res = await Service.createManyService(
         props.listName, manyData.value)
+      if (res.status === 200) {
+        updateActionNodeBg()
+      }
 
-      source.value.data = source.value.data.concat(res.data)
+      source.value.data = source.value.data.concat(res.data.data)
     }
 
     provide(Symbol.for('createManyItemSymbol'), createManyItem)
@@ -294,13 +308,21 @@ export default {
     //   manyData.value = results
     //   createManyItem()
     // }
+    // 修改顺序
     const changeSortIndex = (new_sort_index) => {
       sort_index = new_sort_index
       getAllService()
     };
+    // 修改已改动的背景
+    const updateActionNodeBg = () => {
+      const actionNodes = document.querySelectorAll('.update-bg')
+      for (const actionNode of actionNodes) {
+        actionNode.className = 'list-body'
+      }
+    }
 
     return {
-      source,listSize, // 数据需要的属性
+      source, listSize, // 数据需要的属性
       allChecked, allCheck, checkList, // 选中
       updateList, deleteList, // 删改
       createItem, createOneList, // 增
@@ -337,7 +359,7 @@ export default {
 .list-body > span,
 .list-body > input,
 .list-body > select {
-  font-size: .8rem;
+  font-size: 1.1rem;
   flex: 1 1 auto;
 }
 .function-button {
@@ -353,5 +375,23 @@ export default {
 }
 .tool {
   margin: .5rem 0;
+}
+.update-btn, .create-btn {
+  border-radius: 1rem;
+  background-color: var(--main-bg-color);
+  box-shadow: inset 0 -.15em 0 rgba(0, 0, 0, .5);
+  padding: .4rem;
+  color: #fff;
+  margin: .4em auto;
+  width: 80%;
+}
+.update-btn:active, .create-btn:active {
+  box-shadow: none;
+}
+.update-btn:hover, .create-btn:hover {
+  background-color: #7fdfd4;
+}
+.update-bg {
+  background-color: mediumaquamarine;
 }
 </style>

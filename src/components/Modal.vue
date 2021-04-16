@@ -59,13 +59,16 @@ export default {
   background-color: rgba(0, 0, 0, .5);
 }
 .modal {
-  background: rgba(250, 250, 250, 1);
-  width: 34vw;
-  height: 26vh;
+  color: var(--main-bg-color);
+  background-color: rgba(250, 250, 250, 1);
+  width: 25vw;
+  height: 20vh;
   margin: 20vh auto;
   border-radius: .5em;
+  border: .5em solid var(--main-bg-color);
   padding: 2vh 0;
   position: relative;
+  filter: drop-shadow(2px 4px 6px black);
   font-size: 1.4em;
 }
 .modal-body {
@@ -82,7 +85,10 @@ export default {
   color: #fff;
   font-size: .8em;
   box-shadow: inset 0 -.2em 0 rgba(0, 0, 0, .1);
-  background-color: aquamarine;
+  background-color: var(--main-bg-color);
+}
+.modal-button:hover {
+  background-color: #7fdfd4;
 }
 @media (max-width: 768px) {
   .modal {

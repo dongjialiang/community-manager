@@ -164,6 +164,9 @@ export default {
   transition: color padding box-shadow cubic-bezier(0.445, 0.05, 0.55, 0.95)
     0.3s;
 }
+ul {
+  padding: 0;
+}
 .submit:active {
   padding: 0.1em 0 0;
   color: #eee;
@@ -176,21 +179,23 @@ export default {
   position: absolute;
   list-style: none;
   background-color: #fff;
-  padding: 0 .4em;
   left: calc((100% - 24em) / 2);
-  border: 1px solid #000;
   top: 0.9em;
+  box-shadow: 0.1rem 0.1rem 0.3rem #000;
   line-height: 1.5em;
 }
 .autocomplete-btn {
   display: flex;
   width: 100%;
+  padding: 0 .4em;
   justify-content: space-between;
-  font-size: .8em;
+  font-size: .9em;
   border-bottom: 1px solid #000;
   border-radius: 0;
+  line-height: 1.5em;
 }
 .autocomplete-btn:focus {
   background-color: var(--main-bg-color);
+  color: #fff;
 }
 </style>

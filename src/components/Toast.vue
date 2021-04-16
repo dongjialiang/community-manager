@@ -29,15 +29,43 @@ export default {
 .toast {
   position: absolute;
   z-index: 99;
-  top: 5em;
-  left: calc((100% - 30vw) / 2);
   box-sizing: border-box;
+  right: 3vw;
   line-height: 2em;
-  width: 30vw;
+  width: 15em;
   background-color: var(--main-bg-color);
   box-shadow: inset 0 -.2em 0 rgba(0, 0, 0, .1);
+  filter: drop-shadow(0 0 .5em #333);
   pointer-events: all;
   border-radius: .4em;
   color: #fff;
+}
+.toast::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: .8em solid;
+  transition: all .4s;
+}
+@media (max-width: 640px) {
+  .toast {
+    bottom: 8vh;
+  }
+  .toast::after {
+    left: 6.7em;
+    bottom: -1.4rem;
+    border-color: var(--main-bg-color) transparent transparent;
+  }
+}
+@media (min-width: 641px) {
+  .toast {
+    top: 8vh;
+  }
+  .toast::after {
+    right: 3em;
+    top: -1.4rem;
+    border-color: transparent transparent var(--main-bg-color);
+  }
 }
 </style>

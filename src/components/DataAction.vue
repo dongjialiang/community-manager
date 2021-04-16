@@ -14,6 +14,7 @@
       class="banner-img"
       :src="item[column.name].startsWith('http')
         ? item[column.name] : baseURL + item[column.name]"
+      alt="图片未加载完成"
     >
     <template v-else>
       <input
@@ -169,18 +170,22 @@ export default {
 
       const itemIsNone = item[name] === undefined
 
-      if ((content === '' && itemIsNone)
-        || (tempList.value[id] !== undefined
-        && compare(content, item[name]))) {
+      if ((content === '' && itemIsNone)     // 原有内容和新内容为空
+        || (tempList.value[id] !== undefined // 临时列表不为空
+        && compare(content, item[name]))) {  // 原有内容和新内容不同
+        e.target.className = ''
         delete tempList.value[id][name]
       } else {
         tempObj[name] = content
-        if (tempList.value[id]) {
+        if (e.target.parentNode.className === 'list-body') {
+          e.target.parentNode.className ='update-bg list-body'
+        }
+        if (tempList.value[id]) { // 临时列表已存在
           tempList.value[id] = {
             ...tempList.value[id],
             ...tempObj
           }
-        } else {
+        } else { // 临时列表不存在, 新建临时列表
           tempList.value[id] = tempObj
         }
       }

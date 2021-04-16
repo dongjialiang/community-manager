@@ -84,9 +84,11 @@ a {
 }
 .user {
   position: relative;
+  color: #fff;
 }
 .set {
   position: absolute;
+  color: #000;
   background-color: #fff;
   z-index: 50;
   left: calc((100% - 5em) / 2);

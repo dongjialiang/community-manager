@@ -54,6 +54,12 @@ export default {
 
     const modalAction = modal().modalAction
 
+    const script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'https://cdn.jsdelivr.net/npm/xlsx'
+    + '@0.16.9/dist/xlsx.mini.min.js'
+    document.body.appendChild(script)
+
     // 读取Excel表格文件的数据到数据列表中
     const readExcelToData = (event) => {
       const eCurrentTarget = event.currentTarget

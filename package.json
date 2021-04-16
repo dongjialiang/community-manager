@@ -8,19 +8,20 @@
     "test": "cross-env DEBUG=pw:api node test/many.test.js"
   },
   "dependencies": {
-    "@vitejs/plugin-vue": "^1.1.5",
+    "@vitejs/plugin-vue": "^1.2.1",
     "blueimp-md5": "^2.18.0",
     "nprogress": "^0.2.0",
-    "vue": "^3.0.7",
+    "vite-plugin-compress": "^2.0.0",
+    "vue": "^3.0.11",
     "vue-router": "^4.0.5"
   },
   "devDependencies": {
-    "@vue/compiler-sfc": "^3.0.7",
+    "@vue/compiler-sfc": "^3.0.11",
     "cross-env": "^7.0.3",
-    "eslint": "^7.22.0",
-    "eslint-plugin-vue": "^7.7.0",
-    "playwright": "^1.9.2",
-    "vite": "^2.1.2",
+    "eslint": "^7.23.0",
+    "eslint-plugin-vue": "^7.8.0",
+    "playwright": "^1.10.0",
+    "vite": "^2.1.5",
     "vite-plugin-pwa": "^0.5.6"
   }
 }

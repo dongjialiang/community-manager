@@ -1,6 +1,8 @@
 // 从vue的路由管理器导入创建路由函数和历史
 import { createRouter, createWebHistory } from 'vue-router'
+
 // 导入页面视图文件
+import Home from './views/Home.vue'
 const pages = import.meta.glob('./views/*.vue')
 const titles = {
   '/home': '首页',
@@ -19,10 +21,11 @@ const titles = {
 
 const routes = Object.keys(pages).map((path) => {
   const name = path.match(/\.\/views(.*)\.vue$/)[1].toLowerCase()
+  const homePath = name === '/home'
   return {
-    path: name === '/home' ? '/' : name,
+    path: homePath ? '/' : name,
     alias: name,
-    component: pages[path], // () => import('./views/*.vue')
+    component: homePath ? Home : pages[path], // () => import('./views/*.vue')
     meta: { title: titles[name] }
   }
 })

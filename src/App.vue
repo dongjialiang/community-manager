@@ -75,7 +75,7 @@ export default {
   background-color: var(--main-bg-color);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(20, 20, 20, .8);
+  background-color: rgba(200, 200, 200, .8);
   border-radius: 12px;
 }
 </style>
