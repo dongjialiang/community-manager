@@ -22,7 +22,7 @@
         type="file"
         name="banner"
         hidden
-        @change="modalAction(uploadImage, '上传海报', id)"
+        @change="modalAction(uploadImage, '上传海报', {$event, id})"
       >
       <label
         class="banner"
@@ -173,12 +173,13 @@ export default {
       if ((content === '' && itemIsNone)     // 原有内容和新内容为空
         || (tempList.value[id] !== undefined // 临时列表不为空
         && compare(content, item[name]))) {  // 原有内容和新内容不同
-        e.target.className = ''
+        e.currentTarget.className = ''
         delete tempList.value[id][name]
       } else {
         tempObj[name] = content
-        if (e.target.parentNode.className === 'list-body') {
-          e.target.parentNode.className ='update-bg list-body'
+        if (e === undefined) {
+        } else if (e.currentTarget.parentNode.className === 'list-body') {
+          e.currentTarget.parentNode.className ='update-bg list-body'
         }
         if (tempList.value[id]) { // 临时列表已存在
           tempList.value[id] = {
@@ -191,7 +192,7 @@ export default {
       }
     }
     // 上传图片
-    const uploadImage = async (id) => {
+    const uploadImage = async ({ e, id }) => {
       const formData = new FormData()
       const bannerDom = await document
         .querySelector(`input[id='banner-${id}']`)
